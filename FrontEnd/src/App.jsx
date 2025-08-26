@@ -1,37 +1,35 @@
-import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
-import Login from "./Components/Login";
-import Register from "./Components/Register";
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./Components/Navbar";
 import Home from "./Components/Home";
 import Footer from "./Components/Footer";
+import UserLogin from "./Components/UserLogin";  // ✅ Import Login
+import UserRegister from "./Components/UserRegister"; // ✅ Import Register
+import Login from "./Components/Login"; // ✅ Import UserLogin
+import AdminLogin from "./Components/AdminLogin"; // ✅ Import AdminLogin
+
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("authToken"));
-
   return (
     <Router>
-      <AppContent isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
+      <div className="min-h-screen bg-gray-100 flex flex-col">
+        {/* Navbar always visible */}
+        <Navbar />
+
+        <div className="flex-1">
+          <Routes>
+            <Route path="/" element={<Home />} />         {/* Home Page */}
+            <Route path="/login" element={<Login />} /> {/* Login Page */}
+            <Route path="/user/login" element={<UserLogin />} /> {/* UserLogin Page */}
+            <Route path="/user/register" element={<UserRegister />} /> {/* UserRegister Page */}
+            <Route path="/admin/login" element={<AdminLogin />} /> {/* AdminLogin Page */}
+
+          </Routes>
+        </div>
+        {/* Footer always visible */}
+        <Footer />
+      </div>
     </Router>
-  );
-}
-
-// ✅ Separate component to handle Navbar visibility
-function AppContent({ isLoggedIn, setIsLoggedIn }) {
-  const location = useLocation();
-  const hideNavbarOnRoutes = ["/", "/register"]; // Navbar hidden on login/register
-  const isNavbarHidden = hideNavbarOnRoutes.includes(location.pathname);
-
-  return (
-    <div className="min-h-screen bg-gray-100">
-      {!isNavbarHidden && <Navbar setIsLoggedIn={setIsLoggedIn} />}
-      <Routes>
-        <Route path="/" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/home" element={<Home />} />
-      </Routes>
-      {!isNavbarHidden && <Footer />} {/* ✅ Footer always visible except login/register */}
-    </div>
   );
 }
 

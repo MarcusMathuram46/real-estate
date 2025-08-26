@@ -1,119 +1,50 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { FaUserAlt, FaUserShield } from "react-icons/fa";
 
 function Login() {
-  const [loginData, setLoginData] = useState({
-    email: "",
-    password: "",
-  });
-  const [msg, setMsg] = useState("");
-  const navigate = useNavigate(); // ✅ for redirecting
-
-  const handleInputChange = (e) => {
-    setLoginData({ ...loginData, [e.target.name]: e.target.value });
-  };
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await axios.post(
-        "http://localhost:4000/api/user/login",
-        loginData
-      );
-      const info = response.data;
-
-      if (info.token) {
-        localStorage.setItem("authToken", info.token);
-        setMsg("✅ Login Successful");
-
-        // redirect after login
-        setTimeout(() => {
-          navigate("/home"); // ✅ go to Home.jsx
-        }, 1000);
-      } else {
-        setMsg("❌ " + info.message);
-      }
-      setLoginData({ email: "", password: "" });
-    } catch (error) {
-      setMsg("❌ " + error.message);
-      console.error(error);
-    }
-  };
+  const navigate = useNavigate();
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-8 bg-white shadow-lg rounded-2xl">
-        <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">
-          Login
-        </h1>
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="bg-white p-10 rounded-3xl shadow-2xl flex flex-col items-center space-y-8 w-[22rem]"
+      >
+        <motion.h1
+          initial={{ y: -30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.6 }}
+          className="text-3xl font-bold text-gray-800 mb-2"
+        >
+          Choose Login
+        </motion.h1>
 
-        <form onSubmit={handleLogin} className="space-y-5">
-          {/* Email */}
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">
-              Email Address
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={loginData.email}
-              onChange={handleInputChange}
-              placeholder="Enter your Email"
-              autoComplete="email"
-              required
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            />
-          </div>
+        {/* User Login Button */}
+        <motion.button
+          whileHover={{ scale: 1.08 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => navigate("/user/login")}
+          className="w-full flex items-center justify-center space-x-3 py-3 px-6 text-lg font-semibold text-white bg-blue-600 rounded-xl shadow-lg hover:bg-blue-700 transition duration-300"
+        >
+          <FaUserAlt className="text-2xl animate-bounce" />
+          <span>User Login</span>
+        </motion.button>
 
-          {/* Password */}
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">
-              Password
-            </label>
-            <input
-              type="password"
-              name="password"
-              value={loginData.password}
-              onChange={handleInputChange}
-              placeholder="Enter password"
-              autoComplete="current-password"
-              required
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            />
-          </div>
-
-          {/* Submit */}
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-300"
-          >
-            Login
-          </button>
-
-          {/* Register Link */}
-          <p className="mt-3 text-center text-gray-600">
-            Don&apos;t have an account?{" "}
-            <Link
-              to="/register"
-              className="text-blue-600 font-semibold hover:underline"
-            >
-              Register
-            </Link>
-          </p>
-
-          {/* Message */}
-          {msg && (
-            <p
-              className={`text-center font-medium mt-3 ${
-                msg.startsWith("✅") ? "text-green-600" : "text-red-600"
-              }`}
-            >
-              {msg}
-            </p>
-          )}
-        </form>
-      </div>
+        {/* Admin Login Button */}
+        <motion.button
+          whileHover={{ scale: 1.08 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => navigate("/admin/login")}
+          className="w-full flex items-center justify-center space-x-3 py-3 px-6 text-lg font-semibold text-white bg-purple-600 rounded-xl shadow-lg hover:bg-purple-700 transition duration-300"
+        >
+          <FaUserShield className="text-2xl animate-spin-slow" />
+          <span>Admin Login</span>
+        </motion.button>
+      </motion.div>
     </div>
   );
 }

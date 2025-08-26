@@ -1,31 +1,31 @@
-import React, { useState } from "react";
-import { QRCodeCanvas } from "qrcode.react"; // Install: npm install qrcode.react
+import React, { useState } from 'react';
+import { QRCodeCanvas } from 'qrcode.react'; // Install: npm install qrcode.react
 
 const services = [
   {
     id: 1,
-    title: "Patta Transfer & Change",
-    desc: "Assistance with ownership records and revenue department updates.",
+    title: 'Patta Transfer & Change',
+    desc: 'Assistance with ownership records and revenue department updates.',
   },
   {
     id: 2,
-    title: "Legal Documentation",
-    desc: "Drafting and verification of sale deeds, agreements, and other legal documents.",
+    title: 'Legal Documentation',
+    desc: 'Drafting and verification of sale deeds, agreements, and other legal documents.',
   },
   {
     id: 3,
-    title: "Property Disputes & Legal Issues",
-    desc: "Expert guidance and liaison with legal professionals to resolve disputes quickly.",
+    title: 'Property Disputes & Legal Issues',
+    desc: 'Expert guidance and liaison with legal professionals to resolve disputes quickly.',
   },
   {
     id: 4,
-    title: "Due Diligence & Verification",
-    desc: "Comprehensive checks on property ownership, encumbrances, and title clearance.",
+    title: 'Due Diligence & Verification',
+    desc: 'Comprehensive checks on property ownership, encumbrances, and title clearance.',
   },
   {
     id: 5,
-    title: "Guidance for Buyers & Sellers",
-    desc: "Advisory services to help customers make informed decisions in real estate transactions.",
+    title: 'Guidance for Buyers & Sellers',
+    desc: 'Advisory services to help customers make informed decisions in real estate transactions.',
   },
 ];
 
@@ -33,39 +33,60 @@ function ServiceCards() {
   const [selectedService, setSelectedService] = useState(null);
   const [step, setStep] = useState(null); // "buy" -> payment, "form" -> form
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
+    name: '',
+    email: '',
+    phone: '',
+    paymentId: '',
   });
 
-  const paymentUrl = "upi://pay?pa=yourupi@upi&pn=YourName&am=100&cu=INR"; 
+  const paymentUrl = 'upi://pay?pa=yourupi@upi&pn=YourName&am=100&cu=INR';
   // 👉 Replace with your UPI/payment gateway link
 
   const handleBuyNow = (service) => {
     setSelectedService(service);
-    setStep("buy");
+    setStep('buy');
   };
 
   const handlePaymentDone = () => {
-    setStep("form");
+    setStep('form');
   };
 
   const handleFormChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
+
     const requestData = {
       ...formData,
       service: selectedService.title,
       cost: 100,
     };
-    console.log("Form Submitted:", requestData);
 
-    alert(`Your request for ${selectedService.title} is submitted successfully!`);
-    setStep(null);
-    setFormData({ name: "", email: "", phone: "" });
+    try {
+      const res = await fetch('http://localhost:4000/api/requests', {
+        // 👈 backend API
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestData),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert(
+          `✅ Your request for ${selectedService.title} has been submitted!`,
+        );
+        setStep(null);
+        setFormData({ name: '', email: '', phone: '', paymentId: '' });
+      } else {
+        alert(`❌ Error: ${data.message}`);
+      }
+    } catch (error) {
+      console.error('Submission error:', error);
+      alert('⚠️ Server error. Please try again.');
+    }
   };
 
   return (
@@ -99,9 +120,8 @@ function ServiceCards() {
       {step && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-6 rounded-xl shadow-xl w-96">
-            
             {/* Step 1: Payment */}
-            {step === "buy" && (
+            {step === 'buy' && (
               <>
                 <h2 className="text-xl font-bold text-gray-800 mb-4">
                   Pay ₹100 for {selectedService?.title}
@@ -110,16 +130,16 @@ function ServiceCards() {
                   Scan the QR code below or click payment link.
                 </p>
                 <div className="flex justify-center mb-4">
-                  <QRCodeCanvas  value={paymentUrl} size={180} />
+                  <QRCodeCanvas value={paymentUrl} size={180} />
                 </div>
-                <a
+                {/* <a
                   href={paymentUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block text-center w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition mb-3"
                 >
                   Pay Now
-                </a>
+                </a> */}
                 <button
                   onClick={handlePaymentDone}
                   className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition mb-2"
@@ -136,7 +156,7 @@ function ServiceCards() {
             )}
 
             {/* Step 2: Form */}
-            {step === "form" && (
+            {step === 'form' && (
               <>
                 <h2 className="text-xl font-bold text-gray-800 mb-4">
                   Request for {selectedService?.title}
@@ -169,6 +189,16 @@ function ServiceCards() {
                     className="w-full p-2 border rounded-lg"
                     required
                   />
+                  <input
+                    type="text"
+                    name="paymentId"
+                    placeholder="Payment ID"
+                    value={formData.paymentId}
+                    onChange={handleFormChange}
+                    className="w-full p-2 border rounded-lg"
+                    required
+                  />
+
                   <button
                     type="submit"
                     className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
