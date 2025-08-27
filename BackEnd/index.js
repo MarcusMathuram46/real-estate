@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const { MONGODB_URL, PORT } = require('./config');
 const loginRoutes = require('./Route/userRoutes.js');
 const serviceRequestRoutes = require('./Route/serviceRequestRoutes.js');
-const adminRoutes = require('./Route/AdminRoutes.js');
+const adminRoutes = require('./Route/Admin.js');
 const cors = require('cors');
 const app = express();
 app.use(express.json());
