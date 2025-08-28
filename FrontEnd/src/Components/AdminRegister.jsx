@@ -8,6 +8,7 @@ function AdminRegister() {
     email: "",
     password: "",
     rePassword: "",
+    
   });
   const [msg, setMsg] = useState("");
   const [validateEmail, setValidateEmail] = useState(false);
@@ -42,6 +43,7 @@ function AdminRegister() {
         username: registerData.name,
         email: registerData.email,
         password: registerData.password,
+        role: "admin",
       });
 
       setMsg("✅ Registration Successful! Redirecting to login...");

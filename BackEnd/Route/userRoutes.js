@@ -1,6 +1,6 @@
 const express = require("express");
 const { login, createUser, createAdmin } = require("../Controller/loginCtrl");
-const Verifyrole = require("../Verifyrole");
+const Verifyrole = require("../Utils/VerifyRole.js");
 const router = express.Router();
 
 // Public

@@ -4,7 +4,7 @@ import axios from "axios";
 
 function UserRegister() {
   const [registerData, setRegisterData] = useState({
-    name: "",
+    username: "",
     email: "",
     password: "",
     role: "user", // ✅ default role
@@ -44,7 +44,7 @@ function UserRegister() {
       }
 
       // reset form
-      setRegisterData({ name: "", email: "", password: "", role: "user" });
+      setRegisterData({ username: "", email: "", password: "", role: "user" });
     } catch (error) {
       setMsg("❌ " + (error.response?.data?.message || error.message));
       console.error(error);
@@ -63,8 +63,8 @@ function UserRegister() {
             <label className="block text-gray-700 font-medium mb-1">Name</label>
             <input
               type="text"
-              name="name"
-              value={registerData.name}
+              name="username"
+              value={registerData.username}
               onChange={handleInputChange}
               placeholder="Enter your Name"
               autoComplete="name"

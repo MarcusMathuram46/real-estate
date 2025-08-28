@@ -1,5 +1,5 @@
 require('dotenv').config();
-const Adminlogin = require('../Model/AdminLog.js');
+const Login = require('../Model/LoginModel.js');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 // const app = require('../app');
@@ -13,11 +13,11 @@ const Admincontroller = {
   register: async (req, res) => {
     try {
       // console.log("register login");
-      // console.log(req.body);
+      console.log(req.body);
 
       const { username, email, password, role } = req.body;
 
-      const verifyemail = await Adminlogin.findOne({ email: email });
+      const verifyemail = await Login.findOne({ email: email });
       // console.log(verifyemail);
 
       if (verifyemail) {
@@ -25,7 +25,7 @@ const Admincontroller = {
       }
 
       const hashpassword = await bcrypt.hash(password, 10);
-      const newuser = new Adminlogin({
+      const newuser = new Login({
         username,
         email,
         password: hashpassword,
@@ -67,7 +67,7 @@ const Admincontroller = {
   },
   getallrole: async (req, res) => {
     try {
-      const alldata = await Adminlogin.find({}, 'username email role');
+      const alldata = await Login.find({}, 'username email role');
 
       res.status(200).json(alldata);
     } catch (error) {
@@ -81,7 +81,7 @@ const Admincontroller = {
 
       const { email, password } = req.body;
 
-      const user = await Adminlogin.findOne({ email });
+      const user = await Login.findOne({ email });
       if (!user || !(await bcrypt.compare(password, user.password))) {
         return res.status(400).json({ message: 'Invalid credentials' });
       }
@@ -99,7 +99,7 @@ const Admincontroller = {
       }
 
       // Find user by email
-      const verifyUser = await Adminlogin.findOne({ email });
+      const verifyUser = await Login.findOne({ email });
 
       if (!verifyUser) {
         return res.status(400).json({ message: 'User not found' });
@@ -166,7 +166,7 @@ const Admincontroller = {
       const userid = req.userid; // Extract the user id from the JWT payload
 
       // Find the user by their ID and exclude sensitive fields like password
-      const user = await Adminlogin.findOne({ _id: userid }).select(
+      const user = await Login.findOne({ _id: userid }).select(
         '-password -__v -createdAt -updatedAt',
       );
 
@@ -199,7 +199,7 @@ const Admincontroller = {
       // console.log(req.body);
 
       const { email } = req.body;
-      const checkemail = await Adminlogin.findOne({ email: email });
+      const checkemail = await Login.findOne({ email: email });
       // console.log("User found:", checkemail);
 
       if (!checkemail) {
@@ -249,7 +249,7 @@ const Admincontroller = {
           .json({ message: 'Token and new password are required.' });
       }
 
-      const users = await Adminlogin.findOne({
+      const users = await Login.findOne({
         resetPasswordToken: token,
         resetPasswordExpires: { $gt: Date.now() }, // Ensure token is not expired
       });
@@ -275,7 +275,7 @@ const Admincontroller = {
       const AdminloginId = req.userid; // Logged-in user's ID from token
       const { id, username, email, role } = req.body;
 
-      const loggedInUser = await Adminlogin.findById(AdminloginId);
+      const loggedInUser = await Login.findById(AdminloginId);
       if (!loggedInUser) {
         return res
           .status(401)
@@ -289,7 +289,7 @@ const Admincontroller = {
         });
       }
 
-      const userToUpdate = await Adminlogin.findById(id);
+      const userToUpdate = await Login.findById(id);
       if (!userToUpdate) {
         return res.status(404).json({ message: 'User to update not found' });
       }
@@ -323,7 +323,7 @@ const Admincontroller = {
       // console.log("Logged in Admin ID:", adminId);
       // console.log("User to delete ID:", id);
 
-      const loggedInAdmin = await Adminlogin.findById(adminId);
+      const loggedInAdmin = await Login.findById(adminId);
       if (!loggedInAdmin) {
         return res
           .status(401)
@@ -337,12 +337,12 @@ const Admincontroller = {
         });
       }
 
-      const userToDelete = await Adminlogin.findById(id);
+      const userToDelete = await Login.findById(id);
       if (!userToDelete) {
         return res.status(404).json({ message: 'User not found' });
       }
 
-      await Adminlogin.findByIdAndDelete(id);
+      await Login.findByIdAndDelete(id);
       return res.status(200).json({ message: 'User deleted successfully' });
     } catch (error) {
       console.error('Error deleting user:', error);
@@ -357,7 +357,7 @@ const Admincontroller = {
       const { id } = req.params;
       // console.log("Approving user with ID:", id);
 
-      const user = await Adminlogin.findById(id);
+      const user = await Login.findById(id);
       if (!user) return res.status(404).json({ message: 'User not found' });
 
       if (user.status === 'approved') {
@@ -378,7 +378,7 @@ const Admincontroller = {
     try {
       const { id } = req.params;
       // console.log("Approving user with ID:", id);
-      const user = await Adminlogin.findById(id);
+      const user = await Login.findById(id);
 
       if (!user) return res.status(404).json({ message: 'User not found' });
       if (user.status === 'rejected') {
@@ -396,7 +396,7 @@ const Admincontroller = {
   approve: async (req, res) => {
     try {
       const id = req.params.id;
-      await Adminlogin.findByIdAndUpdate(id, { status: 'approved' });
+      await Login.findByIdAndUpdate(id, { status: 'approved' });
       res.send('<h2>User approved successfully ✅</h2>');
     } catch (err) {
       res.status(500).send('Error approving user: ' + err.message);
@@ -406,7 +406,7 @@ const Admincontroller = {
   reject: async (req, res) => {
     try {
       const id = req.params.id;
-      await Adminlogin.findByIdAndUpdate(id, { status: 'rejected' });
+      await Login.findByIdAndUpdate(id, { status: 'rejected' });
       res.send('<h2>User rejected ❌</h2>');
     } catch (err) {
       res.status(500).send('Error rejecting user: ' + err.message);

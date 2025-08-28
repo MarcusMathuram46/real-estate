@@ -1,7 +1,7 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
-const AdminSchema = new mongoose.Schema(
+const LoginSchema = new mongoose.Schema(
   {
     username: {
       type: String,
@@ -21,8 +21,8 @@ const AdminSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["admin", "user"], // ✅ only two roles
-      default: "user",         // default = user
+      enum: ["admin", "user"], 
+      default: "user",         
     },
     status: {
       type: String,
@@ -36,7 +36,7 @@ const AdminSchema = new mongoose.Schema(
 );
 
 // ✅ Hash password before save
-AdminSchema.pre("save", async function (next) {
+LoginSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
@@ -44,8 +44,9 @@ AdminSchema.pre("save", async function (next) {
 });
 
 // ✅ Compare entered password with hashed password
-AdminSchema.methods.matchPassword = async function (enteredPassword) {
+LoginSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-module.exports = mongoose.model("Admin", AdminSchema);
+// ✅ Prevent OverwriteModelError
+module.exports = mongoose.models.Login || mongoose.model("Login", LoginSchema);
