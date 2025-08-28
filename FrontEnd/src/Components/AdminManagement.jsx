@@ -1,11 +1,7 @@
-
-
-
 import React, { useState, useEffect } from 'react';
 import axios from './axios';
-import "../style/AdminManagement.css";
 
-const roles = ['Super Admin', 'Admin', 'Mentors', 'Recruiter']; 
+const roles = ['Admin', 'User']; // ✅ Only two roles
 
 function AdminManagement() {
   const [admins, setAdmins] = useState([]);
@@ -18,13 +14,11 @@ function AdminManagement() {
 
   useEffect(() => {
     fetchAdmins();
-  
   }, []);
 
   const fetchAdmins = async () => {
     try {
       const res = await axios.get(`/admin/alluser`);
-      console.log("Fetched Admins:", res.data);  // Debugging log
       setAdmins(res.data);
     } catch (error) {
       console.error("Failed to fetch admins:", error);
@@ -32,18 +26,8 @@ function AdminManagement() {
   };
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-
-    if (name === 'permissions') {
-      const updatedPermissions = checked
-        ? [...formData.permissions, value]
-        : formData.permissions.filter((perm) => perm !== value);
-      setFormData({ ...formData, permissions: updatedPermissions });
-    } else if (type === 'checkbox') {
-      setFormData({ ...formData, [name]: checked });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e) => {
@@ -51,27 +35,15 @@ function AdminManagement() {
     try {
       const token = localStorage.getItem("token");
       if (editId) {
-        // Update admin
-        console.log("Updating admin with ID:", editId);  // Debugging log
-        const res = await axios.put(
+        await axios.put(
           `/admin/update-role`,
-          {
-            id: editId,
-            username: formData.username,
-            email: formData.email,
-            role: formData.role,
-          },
-          {
-            withCredentials: true,
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          { id: editId, ...formData },
+          { headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
         );
-        console.log("Update response:", res);  // Debugging log
       } else {
-        // Create new admin
         await axios.post(`/admin/register`, formData);
       }
-      fetchAdmins();  // Refresh the list
+      fetchAdmins();
       resetForm();
     } catch (error) {
       console.error("Error saving admin:", error);
@@ -79,7 +51,6 @@ function AdminManagement() {
   };
 
   const handleEdit = (admin) => {
-    console.log("Editing admin:", admin);  // Debugging log
     setFormData({
       username: admin.username || '',
       email: admin.email || '',
@@ -89,112 +60,135 @@ function AdminManagement() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // const handleDelete = async (id) => {
-  //   if (window.confirm("Are you sure you want to delete this admin?")) {
-  //     try {
-  //       console.log("Deleting admin with ID:", id);  // Debugging log
-  //       await axios.delete(`/admin/deleteUser/${id}`, {
-  //         data: { userIdToDelete: id },
-  //         withCredentials: true,
-  //       });
-  //       fetchAdmins();  // Refresh the list
-  //     } catch (error) {
-  //       console.error("Error deleting admin:", error);
-  //     }
-  //   }
-  // };
-const handleDelete = async (id) => {
-  if (window.confirm("Are you sure you want to delete this admin?")) {
-    try {
-      const token = localStorage.getItem("token");  // get token from localStorage
-      console.log("Deleting admin with ID:", id);
-
-      await axios.delete(`/admin/deleteUser/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,  // add bearer token header
-        },
-        withCredentials: true,  // if your backend uses cookies as well
-      });
-
-      fetchAdmins();  // Refresh the list
-    } catch (error) {
-      console.error("Error deleting admin:", error);
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this user?")) {
+      try {
+        const token = localStorage.getItem("token");
+        await axios.delete(`/admin/deleteUser/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        });
+        fetchAdmins();
+      } catch (error) {
+        console.error("Error deleting admin:", error);
+      }
     }
-  }
-};
-
-
-
-
+  };
 
   const resetForm = () => {
-    setFormData({
-      username: '',
-      email: '',
-      role: '',
-    });
+    setFormData({ username: '', email: '', role: '' });
     setEditId(null);
   };
 
   return (
-    <div className="AD-container">
-      <h1>User & Role Management</h1>
+    <div className="p-6 max-w-5xl mx-auto">
+      <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+        User & Role Management
+      </h1>
 
-      {/* Show form only when editing */}
-      {editId !== null && (
-        <form onSubmit={handleSubmit} className="admin-form">
-          <input
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            placeholder="Name"
-            required
-          />
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="Email"
-            required
-          />
-
-          <select name="role" value={formData.role} onChange={handleChange} required>
-            <option value="">Select Role</option>
-            {roles.map((role) => (
-              <option key={role} value={role}>{role}</option>
-            ))}
-          </select>
-
-          <button type="submit">
-            {editId ? 'Update' : 'Add'} Admin
-          </button>
+      {/* Form */}
+      {(editId !== null || true) && (
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white shadow-md rounded-xl p-6 mb-8 space-y-4"
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <input
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              placeholder="Name"
+              required
+              className="border rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400"
+            />
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="Email"
+              required
+              className="border rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400"
+            />
+            <select
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              required
+              className="border rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400"
+            >
+              <option value="">Select Role</option>
+              {roles.map((role) => (
+                <option key={role} value={role}>{role}</option>
+              ))}
+            </select>
+          </div>
+          <div className="flex gap-3">
+            <button
+              type="submit"
+              className="bg-indigo-600 text-white px-6 py-2 rounded-lg shadow hover:bg-indigo-700 transition"
+            >
+              {editId ? 'Update User' : 'Add User'}
+            </button>
+            {editId && (
+              <button
+                type="button"
+                onClick={resetForm}
+                className="bg-gray-400 text-white px-6 py-2 rounded-lg shadow hover:bg-gray-500 transition"
+              >
+                Cancel
+              </button>
+            )}
+          </div>
         </form>
       )}
 
-      <table>
-        <thead>
-          <tr className="ad-tr">
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {admins.map((admin) => (
-            <tr key={admin._id}>
-              <td data-label="Name">{admin.username}</td>
-              <td data-label="Email">{admin.email}</td>
-              <td data-label="Role">{admin.role}</td>
-              <td data-label="Actions">
-                <button onClick={() => handleEdit(admin)}>Edit</button>
-                <button onClick={() => handleDelete(admin._id)}>Delete</button>
-              </td>
+      {/* Table */}
+      <div className="overflow-x-auto bg-white shadow-md rounded-xl">
+        <table className="w-full text-left border-collapse">
+          <thead className="bg-indigo-600 text-white">
+            <tr>
+              <th className="py-3 px-4">Name</th>
+              <th className="py-3 px-4">Email</th>
+              <th className="py-3 px-4">Role</th>
+              <th className="py-3 px-4">Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {admins.map((admin, idx) => (
+              <tr
+                key={admin._id}
+                className={idx % 2 === 0 ? "bg-gray-50" : "bg-white"}
+              >
+                <td className="py-3 px-4">{admin.username}</td>
+                <td className="py-3 px-4">{admin.email}</td>
+                <td className="py-3 px-4">{admin.role}</td>
+                <td className="py-3 px-4 space-x-2">
+                  <button
+                    onClick={() => handleEdit(admin)}
+                    className="bg-yellow-500 text-white px-4 py-1 rounded-lg hover:bg-yellow-600 transition"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(admin._id)}
+                    className="bg-red-600 text-white px-4 py-1 rounded-lg hover:bg-red-700 transition"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+            {admins.length === 0 && (
+              <tr>
+                <td colSpan="4" className="text-center py-4 text-gray-500">
+                  No users found
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

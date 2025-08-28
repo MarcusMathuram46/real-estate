@@ -7,6 +7,7 @@ function UserRegister() {
     name: "",
     email: "",
     password: "",
+    role: "user", // ✅ default role
   });
   const [msg, setMsg] = useState("");
   const navigate = useNavigate();
@@ -18,12 +19,34 @@ function UserRegister() {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:4000/api/user/register", registerData);
-      setMsg("✅ Registration Successful! Redirecting to login...");
-      setTimeout(() => navigate("/"), 1000);
-      setRegisterData({ name: "", email: "", password: "" });
+      const res = await axios.post(
+        "http://localhost:4000/api/user/register",
+        registerData
+      );
+
+      if (res.data.token && res.data.role) {
+        // ✅ save auth in localStorage
+        localStorage.setItem("authToken", res.data.token);
+        localStorage.setItem("role", res.data.role);
+
+        setMsg("✅ Registration Successful! Redirecting...");
+
+        // ✅ role-based redirect
+        setTimeout(() => {
+          if (res.data.role === "admin") {
+            navigate("/admin/dashboard");
+          } else {
+            navigate("/user/home"); // keep consistent with your App.jsx
+          }
+        }, 1000);
+      } else {
+        setMsg("❌ Registration failed, try again!");
+      }
+
+      // reset form
+      setRegisterData({ name: "", email: "", password: "", role: "user" });
     } catch (error) {
-      setMsg("❌ " + error.message);
+      setMsg("❌ " + (error.response?.data?.message || error.message));
       console.error(error);
     }
   };

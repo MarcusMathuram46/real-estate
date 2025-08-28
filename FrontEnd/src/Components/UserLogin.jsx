@@ -24,12 +24,21 @@ function UserLogin() {
       const info = response.data;
 
       if (info.token) {
+        // ✅ Save token + role
         localStorage.setItem("authToken", info.token);
+        if (info.role) {
+          localStorage.setItem("role", info.role);
+        }
+
         setMsg("✅ Login Successful");
 
-        // redirect after login
+        // ✅ redirect based on role
         setTimeout(() => {
-          navigate("/"); // ✅ go to Home.jsx
+          if (info.role === "admin") {
+            navigate("/admin/dashboard");
+          } else {
+            navigate("/user/dashboard");
+          }
         }, 1000);
       } else {
         setMsg("❌ " + info.message);
