@@ -36,4 +36,43 @@ const getAllRequests = async (req, res) => {
   }
 };
 
-module.exports={ createServiceRequest, getAllRequests };
+// update
+const updateServiceRequest = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updatedData = req.body;
+
+    const updatedRequest = await ServiceRequest.findByIdAndUpdate(
+      id,
+      updatedData,
+      { new: true }
+    );
+
+    if (!updatedRequest) {
+      return res.status(404).json({ message: "Request not found" });
+    }
+
+    res.json({ message: "Request updated successfully", updatedRequest });
+  } catch (err) {
+    console.error("Error updating request:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Delete a service request
+const deleteServiceRequest = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletedRequest = await ServiceRequest.findByIdAndDelete(id);
+
+    if (!deletedRequest) {
+      return res.status(404).json({ message: "Request not found" });
+    }
+
+    res.json({ message: "Request deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting request:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+module.exports={ createServiceRequest, getAllRequests, updateServiceRequest, deleteServiceRequest };

@@ -9,7 +9,7 @@ const transporter = require('../Utils/Approvel.js'); // nodemailer instance
 
 const path = require('path');
 
-const Admincontroller = {
+const Usercontroller = {
   register: async (req, res) => {
     try {
       // console.log('register login');
@@ -35,14 +35,14 @@ const Admincontroller = {
 
       await newuser.save();
 
-      const approveURL = `http://localhost:4000/api/admin/approveEmail/${newuser._id}`;
-const rejectURL = `http://localhost:4000/api/admin/rejectEmail/${newuser._id}`;
+      const approveURL = `http://localhost:4000/api/user/approveEmail/${newuser._id}`;
+const rejectURL = `http://localhost:4000/api/user/rejectEmail/${newuser._id}`;
 
 
       const mailOptions = {
         from: process.env.EMAIL,
         to: process.env.SUPER_ADMIN_EMAIL,
-        subject: 'New Admin Registration Pending Approval',
+        subject: 'New User Registration Pending Approval',
         html: `
           <h3>New Registration Request</h3>
           <p><strong>Username:</strong> ${username}</p>
@@ -378,7 +378,7 @@ const rejectURL = `http://localhost:4000/api/admin/rejectEmail/${newuser._id}`;
       user.status = 'approved';
       await user.save();
 
-      res.send('✅ Admin approved successfully!');
+      res.send('✅ User approved successfully!');
     } catch (err) {
       console.error('❌ Error:', err);
       res.status(500).send('Error approving user');
@@ -408,7 +408,7 @@ const rejectURL = `http://localhost:4000/api/admin/rejectEmail/${newuser._id}`;
     try {
       const id = req.params.id;
       await Login.findByIdAndUpdate(id, { status: 'approved' });
-      res.send('<h2>Admin approved successfully ✅</h2>');
+      res.send('<h2>User approved successfully ✅</h2>');
     } catch (err) {
       res.status(500).send('Error approving user: ' + err.message);
     }
@@ -425,4 +425,4 @@ const rejectURL = `http://localhost:4000/api/admin/rejectEmail/${newuser._id}`;
   },
 };
 
-module.exports = Admincontroller;
+module.exports = Usercontroller;

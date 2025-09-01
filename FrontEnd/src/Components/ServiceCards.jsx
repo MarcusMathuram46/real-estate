@@ -36,6 +36,7 @@ function ServiceCards() {
     name: '',
     email: '',
     phone: '',
+    service: '',
     paymentId: '',
   });
 
@@ -60,7 +61,8 @@ function ServiceCards() {
 
     const requestData = {
       ...formData,
-      service: selectedService.title,
+      // service: selectedService.title,
+      service: formData.service || selectedService.title,
       cost: 100,
     };
 
@@ -91,9 +93,9 @@ function ServiceCards() {
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-12">
-      <h2 className="text-3xl font-bold text-blue-700 text-center mb-8">
+      {/* <h2 className="text-3xl font-bold text-blue-700 text-center mb-8">
         Our Services
-      </h2>
+      </h2> */}
 
       {/* Services Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -189,6 +191,23 @@ function ServiceCards() {
                     className="w-full p-2 border rounded-lg"
                     required
                   />
+
+                  {/* 🔽 New Dropdown for Services */}
+                  <select
+                    name="service"
+                    value={formData.service || selectedService?.title}
+                    onChange={handleFormChange}
+                    className="w-full p-2 border rounded-lg"
+                    required
+                  >
+                    <option value="">Select a Service</option>
+                    {services.map((s) => (
+                      <option key={s.id} value={s.title}>
+                        {s.title}
+                      </option>
+                    ))}
+                  </select>
+
                   <input
                     type="text"
                     name="paymentId"

@@ -1,83 +1,92 @@
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import Navbar from "./Components/Navbar";
-import Home from "./Components/Home";
-import Footer from "./Components/Footer";
 
-// Auth pages
-import UserLogin from "./Components/UserLogin";
-import UserRegister from "./Components/UserRegister";
-import Login from "./Components/Login"; // Generic login if you have
-import AdminLogin from "./Components/AdminLogin";
-import AdminRegister from "./Components/AdminRegister";
+// ✅ Layouts
+import PublicLayout from "./layouts/PublicLayout";
+import AdminLayout from "./layouts/AdminLayout";
+import UserLayout from "./layouts/UserLayout";
 
-// Protected pages
-import UserDashboard from "./Components/UserDashboard"; // ✅ create this page
-import AdminDashboard from "./Components/AdminDashboard"; // ✅ create this page
+// ✅ Lazy-loaded Pages (improves performance)
+const Home = lazy(() => import("./Components/Home"));
+const UserLogin = lazy(() => import("./Components/UserLogin"));
+const UserRegister = lazy(() => import("./Components/UserRegister"));
+const Login = lazy(() => import("./Components/Login"));
+const AdminLogin = lazy(() => import("./Components/AdminLogin"));
+const AdminRegister = lazy(() => import("./Components/AdminRegister"));
+const UserDashboard = lazy(() => import("./Components/UserDashboard"));
+const AdminDashboard = lazy(() => import("./Components/AdminDashboard"));
+const AdminServices = lazy(() => import("./Components/AdminServices"));
 
-// ✅ Protected Route component
+// ✅ Protected Route Component
 const ProtectedRoute = ({ children, allowedRole }) => {
   const token = localStorage.getItem("authToken");
   const role = localStorage.getItem("role");
 
   if (!token) {
-    // Not logged in
+    // Redirect based on role
     return <Navigate to={allowedRole === "admin" ? "/admin/login" : "/user/login"} replace />;
   }
 
   if (role !== allowedRole) {
-    // Wrong role → block access
+    // Wrong role → kick out
     return <Navigate to="/" replace />;
   }
 
   return children;
 };
 
+// ✅ Loading fallback for lazy imports
+const Loading = () => (
+  <div className="flex items-center justify-center h-screen">
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-blue-500"></div>
+  </div>
+);
+
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-gray-100 flex flex-col">
-        {/* Navbar always visible */}
-        <Navbar />
-
-        <div className="flex-1">
-          <Routes>
-            {/* Public Routes */}
+      <Suspense fallback={<Loading />}>
+        <Routes>
+          {/* 🌍 Public Routes */}
+          <Route element={<PublicLayout />}>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/user/login" element={<UserLogin />} />
             <Route path="/user/register" element={<UserRegister />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/register" element={<AdminRegister />} />
+          </Route>
 
-            {/* User Protected Routes */}
-            <Route
-              path="/user/home"
-              element={
-                <ProtectedRoute allowedRole="user">
-                  <UserDashboard />
-                </ProtectedRoute>
-              }
-            />
+          {/* 👤 User Routes */}
+          <Route
+            path="/user"
+            element={
+              <ProtectedRoute allowedRole="user">
+                <UserLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="dashboard" element={<UserDashboard />} />
+          </Route>
 
-            {/* Admin Protected Routes */}
-            <Route
-              path="/admin/dashboard"
-              element={
-                <ProtectedRoute allowedRole="admin">
-                  <AdminDashboard />
-                </ProtectedRoute>
-              }
-            />
+          {/* 🛠️ Admin Routes */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute allowedRole="admin">
+                <AdminLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="services" element={<AdminServices />} />
+            
+          </Route>
 
-            {/* Catch-all → redirect to home */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </div>
-
-        {/* Footer always visible */}
-        <Footer />
-      </div>
+          {/* 🚧 Catch-all route */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
     </Router>
   );
 }

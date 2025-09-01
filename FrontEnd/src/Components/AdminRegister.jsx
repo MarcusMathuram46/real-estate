@@ -53,7 +53,7 @@ function AdminRegister() {
     } catch (error) {
       setMsg(
         "❌ " +
-          (error.response?.data?.error || "Registration failed. Try again.")
+          (error.response?.data?.message|| "Registration failed. Try again.")
       );
       console.error(error);
     }

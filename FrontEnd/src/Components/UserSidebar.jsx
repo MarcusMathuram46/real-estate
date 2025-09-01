@@ -1,55 +1,56 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import {
-  LayoutDashboard,
-  Users,
+  Home,
+  FileText,
+  MessageSquare,
+  User,
   Settings,
   LogOut,
-  Package,
-  BarChart3,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";  // ✅ import navigate
+import { useNavigate } from "react-router-dom";
 
-function AdminSidebar() {
+function UserSidebar() {
   const [isOpen, setIsOpen] = useState(true);
-  const navigate = useNavigate();  // ✅ hook for redirect
+  const navigate = useNavigate();
 
   const menuItems = [
-    { title: "Dashboard", icon: <LayoutDashboard size={20} />, path: "/admin/dashboard" },
-    { title: "Users", icon: <Users size={20} />, path: "/admin/users" },
-    { title: "Services", icon: <Users size={20} />, path: "/admin/services" },
-    { title: "Packages", icon: <Package size={20} />, path: "/admin/packages" },
-    { title: "Reports", icon: <BarChart3 size={20} />, path: "/admin/reports" },
-    { title: "Settings", icon: <Settings size={20} />, path: "/admin/settings" },
+    { title: "Dashboard", icon: <Home size={20} />, path: "/user/dashboard" },
+    { title: "My Requests", icon: <FileText size={20} />, path: "/user/requests" },
+    { title: "Send Request", icon: <MessageSquare size={20} />, path: "/user/send-request" },
+    { title: "Profile", icon: <User size={20} />, path: "/user/profile" },
+    { title: "Settings", icon: <Settings size={20} />, path: "/user/settings" },
   ];
 
+  // ✅ Logout Handler
   const handleLogout = () => {
-    localStorage.removeItem("authToken"); // ✅ clear token
-    navigate("/login"); // ✅ redirect to login
+    localStorage.removeItem("authToken"); // remove token
+    localStorage.removeItem("role");      // remove role
+    navigate("/user/login");              // redirect to login
   };
 
   return (
     <motion.div
       animate={{ width: isOpen ? "16rem" : "5rem" }}
-      className="h-screen bg-gradient-to-b from-blue-800 to-blue-900 text-white shadow-2xl flex flex-col relative"
+      className="h-screen bg-gradient-to-b from-green-700 to-green-900 text-white shadow-2xl flex flex-col relative"
       transition={{ duration: 0.3, type: "spring", stiffness: 120 }}
     >
       {/* Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="absolute -right-4 top-6 bg-blue-600 p-1 rounded-full shadow-md hover:bg-blue-700 transition"
+        className="absolute -right-4 top-6 bg-green-600 p-1 rounded-full shadow-md hover:bg-green-700 transition"
       >
         {isOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
       </button>
 
       {/* Logo */}
-      <div className="h-20 flex items-center justify-center border-b border-blue-700">
+      <div className="h-20 flex items-center justify-center border-b border-green-600">
         {isOpen ? (
-          <h1 className="text-2xl font-bold tracking-wide">Admin Panel</h1>
+          <h1 className="text-2xl font-bold tracking-wide">User Panel</h1>
         ) : (
-          <h1 className="text-xl font-bold">A</h1>
+          <h1 className="text-xl font-bold">U</h1>
         )}
       </div>
 
@@ -59,8 +60,8 @@ function AdminSidebar() {
           {menuItems.map((item, index) => (
             <li
               key={index}
-              onClick={() => navigate(item.path)} // ✅ navigation
-              className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-blue-700 transition cursor-pointer"
+              onClick={() => navigate(item.path)} // ✅ Navigate on click
+              className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-green-700 transition cursor-pointer"
             >
               {item.icon}
               {isOpen && (
@@ -79,9 +80,9 @@ function AdminSidebar() {
       </div>
 
       {/* Logout Button */}
-      <div className="border-t border-blue-700 px-4 py-4">
+      <div className="border-t border-green-700 px-4 py-4">
         <button
-          onClick={handleLogout}  // ✅ logout action
+          onClick={handleLogout} // ✅ Added logout logic
           className="w-full flex items-center gap-3 px-4 py-3 bg-red-600 hover:bg-red-700 rounded-xl transition"
         >
           <LogOut size={20} />
@@ -92,4 +93,4 @@ function AdminSidebar() {
   );
 }
 
-export default AdminSidebar;
+export default UserSidebar;

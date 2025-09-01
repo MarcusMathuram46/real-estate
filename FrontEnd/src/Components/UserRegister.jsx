@@ -4,49 +4,57 @@ import axios from "axios";
 
 function UserRegister() {
   const [registerData, setRegisterData] = useState({
-    username: "",
+    name: "",
     email: "",
     password: "",
-    role: "user", // ✅ default role
+    rePassword: "",
+    
   });
   const [msg, setMsg] = useState("");
+  const [validateEmail, setValidateEmail] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isRePasswordVisible, setIsRePasswordVisible] = useState(false);
+
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
-    setRegisterData({ ...registerData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setRegisterData({ ...registerData, [name]: value });
+
+    if (name === "email") {
+      setValidateEmail(/^\S+@\S+\.\S+$/.test(value));
+    }
   };
 
   const handleRegister = async (e) => {
     e.preventDefault();
+
+    // Client-side validation
+    if (!registerData.name) return setMsg("❌ Name is required");
+    if (!registerData.email || !validateEmail)
+      return setMsg("❌ Please enter a valid Email ID");
+    if (!registerData.password)
+      return setMsg("❌ Password cannot be empty");
+    if (registerData.password !== registerData.rePassword)
+      return setMsg("❌ Passwords do not match");
+
     try {
-      const res = await axios.post(
-        "http://localhost:4000/api/user/register",
-        registerData
-      );
+      await axios.post("http://localhost:4000/api/user/register", {
+        username: registerData.name,
+        email: registerData.email,
+        password: registerData.password,
+        role: "user",
+      });
 
-      if (res.data.token && res.data.role) {
-        // ✅ save auth in localStorage
-        localStorage.setItem("authToken", res.data.token);
-        localStorage.setItem("role", res.data.role);
+      setMsg("✅ Registration Successful! Redirecting to login...");
+      setRegisterData({ name: "", email: "", password: "", rePassword: "" });
 
-        setMsg("✅ Registration Successful! Redirecting...");
-
-        // ✅ role-based redirect
-        setTimeout(() => {
-          if (res.data.role === "admin") {
-            navigate("/admin/dashboard");
-          } else {
-            navigate("/user/home"); // keep consistent with your App.jsx
-          }
-        }, 1000);
-      } else {
-        setMsg("❌ Registration failed, try again!");
-      }
-
-      // reset form
-      setRegisterData({ username: "", email: "", password: "", role: "user" });
+      setTimeout(() => navigate("/user/login"), 1500);
     } catch (error) {
-      setMsg("❌ " + (error.response?.data?.message || error.message));
+      setMsg(
+        "❌ " +
+          (error.response?.data?.message|| "Registration failed. Try again.")
+      );
       console.error(error);
     }
   };
@@ -55,7 +63,7 @@ function UserRegister() {
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 bg-white shadow-lg rounded-2xl">
         <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
-          Create an Account
+          Create an User Account
         </h2>
         <form onSubmit={handleRegister} className="space-y-5">
           {/* Name */}
@@ -63,8 +71,8 @@ function UserRegister() {
             <label className="block text-gray-700 font-medium mb-1">Name</label>
             <input
               type="text"
-              name="username"
-              value={registerData.username}
+              name="name"
+              value={registerData.name}
               onChange={handleInputChange}
               placeholder="Enter your Name"
               autoComplete="name"
@@ -88,6 +96,9 @@ function UserRegister() {
               required
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
+            {!validateEmail && registerData.email && (
+              <p className="text-red-600 text-sm mt-1">*Enter a valid Email</p>
+            )}
           </div>
 
           {/* Password */}
@@ -95,16 +106,57 @@ function UserRegister() {
             <label className="block text-gray-700 font-medium mb-1">
               Password
             </label>
-            <input
-              type="password"
-              name="password"
-              value={registerData.password}
-              onChange={handleInputChange}
-              placeholder="Enter password"
-              autoComplete="current-password"
-              required
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            />
+            <div className="flex items-center border rounded-lg">
+              <input
+                type={isPasswordVisible ? "text" : "password"}
+                name="password"
+                value={registerData.password}
+                onChange={handleInputChange}
+                placeholder="Enter password"
+                autoComplete="new-password"
+                required
+                className="w-full px-4 py-2 rounded-lg focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+                className="px-3 text-gray-600"
+              >
+                {isPasswordVisible ? "🙈" : "👁️"}
+              </button>
+            </div>
+          </div>
+
+          {/* Re-enter Password */}
+          <div>
+            <label className="block text-gray-700 font-medium mb-1">
+              Re-enter Password
+            </label>
+            <div className="flex items-center border rounded-lg">
+              <input
+                type={isRePasswordVisible ? "text" : "password"}
+                name="rePassword"
+                value={registerData.rePassword}
+                onChange={handleInputChange}
+                placeholder="Re-enter password"
+                autoComplete="new-password"
+                required
+                className="w-full px-4 py-2 rounded-lg focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={() => setIsRePasswordVisible(!isRePasswordVisible)}
+                className="px-3 text-gray-600"
+              >
+                {isRePasswordVisible ? "🙈" : "👁️"}
+              </button>
+            </div>
+            {registerData.rePassword &&
+              registerData.password !== registerData.rePassword && (
+                <p className="text-red-600 text-sm mt-1">
+                  *Passwords do not match
+                </p>
+              )}
           </div>
 
           {/* Button */}
@@ -126,6 +178,17 @@ function UserRegister() {
             </p>
           )}
         </form>
+
+        {/* Already have account */}
+        <p className="text-center mt-4 text-gray-600">
+          Already have an account?{" "}
+          <span
+            className="text-blue-600 cursor-pointer hover:underline"
+            onClick={() => navigate("/user/login")}
+          >
+            Login here
+          </span>
+        </p>
       </div>
     </div>
   );
