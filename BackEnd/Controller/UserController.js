@@ -424,6 +424,27 @@ const Usercontroller = {
       res.status(500).send('Error rejecting user: ' + err.message);
     }
   },
+  updateProfile: async (req, res) => {
+    try {
+      const userId = req.userid; // ✅ from verifyToken
+      const { phone, address } = req.body;
+
+      const updatedUser = await Login.findByIdAndUpdate(
+        userId,
+        { phone, address },
+        { new: true },
+      ).select('-password -__v -createdAt -updatedAt'); // optional: exclude sensitive fields
+
+      if (!updatedUser) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      res.json(updatedUser);
+    } catch (err) {
+      console.error('Update profile error:', err);
+      res.status(500).json({ error: 'Failed to update profile' });
+    }
+  },
 };
 
 module.exports = Usercontroller;

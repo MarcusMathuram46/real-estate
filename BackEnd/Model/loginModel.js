@@ -29,6 +29,14 @@ const LoginSchema = new mongoose.Schema(
       enum: ["pending", "approved", "rejected"],
       default: "pending",
     },
+    phone: {
+      type: String,
+      default: "",
+    },
+    address: {
+      type: String,
+      default: "",
+    },
     resetPasswordToken: String,
     resetPasswordExpires: Date,
   },

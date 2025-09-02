@@ -22,6 +22,7 @@ router.delete("/deleteUser/:id", Verifyrole.verifyToken, usercontroller.deleteUs
 // email routes
 router.get("/approveEmail/:id", usercontroller.approve);
 router.get("/rejectEmail/:id", usercontroller.reject);
+router.put("/updateProfile", Verifyrole.verifyToken, usercontroller.updateProfile);
 
 
 module.exports = router;
