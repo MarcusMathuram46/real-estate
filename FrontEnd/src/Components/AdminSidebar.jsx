@@ -20,6 +20,7 @@ function AdminSidebar() {
     { title: "Dashboard", icon: <LayoutDashboard size={20} />, path: "/admin/dashboard" },
     { title: "Users", icon: <Users size={20} />, path: "/admin/users" },
     { title: "Services", icon: <Users size={20} />, path: "/admin/services" },
+    { title: "Documents", icon: <Users size={20} />, path: "/admin/documents" },
     { title: "Packages", icon: <Package size={20} />, path: "/admin/packages" },
     { title: "Reports", icon: <BarChart3 size={20} />, path: "/admin/reports" },
     { title: "Settings", icon: <Settings size={20} />, path: "/admin/settings" },

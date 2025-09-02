@@ -20,6 +20,7 @@ function UserSidebar() {
     { title: "Dashboard", icon: <Home size={20} />, path: "/user/dashboard" },
     { title: "My Requests", icon: <FileText size={20} />, path: "/user/requests" },
     { title: "Send Request", icon: <MessageSquare size={20} />, path: "/user/send-request" },
+    { title: "Documents", icon: <MessageSquare size={20} />, path: "/user/documents" },
     { title: "Profile", icon: <User size={20} />, path: "/user/profile" },
     { title: "Settings", icon: <Settings size={20} />, path: "/user/settings" },
   ];

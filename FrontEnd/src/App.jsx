@@ -16,6 +16,9 @@ const AdminRegister = lazy(() => import("./Components/AdminRegister"));
 const UserDashboard = lazy(() => import("./Components/UserDashboard"));
 const AdminDashboard = lazy(() => import("./Components/AdminDashboard"));
 const AdminServices = lazy(() => import("./Components/AdminServices"));
+const AdminDocuments = lazy(() => import("./Components/AdminDocuments"));
+const UserDocuments = lazy(() => import("./Components/UserDocuments"));
+const UserProfile = lazy(() => import("./Components/UserProfile"));
 
 // ✅ Protected Route Component
 const ProtectedRoute = ({ children, allowedRole }) => {
@@ -67,6 +70,8 @@ function App() {
             }
           >
             <Route path="dashboard" element={<UserDashboard />} />
+            <Route path="documents" element={<UserDocuments />} />
+            <Route path="profile" element={<UserProfile />} />
           </Route>
 
           {/* 🛠️ Admin Routes */}
@@ -80,6 +85,7 @@ function App() {
           >
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="services" element={<AdminServices />} />
+            <Route path="documents" element={<AdminDocuments />} />
             
           </Route>
 

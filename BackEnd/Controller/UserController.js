@@ -36,8 +36,7 @@ const Usercontroller = {
       await newuser.save();
 
       const approveURL = `http://localhost:4000/api/user/approveEmail/${newuser._id}`;
-const rejectURL = `http://localhost:4000/api/user/rejectEmail/${newuser._id}`;
-
+      const rejectURL = `http://localhost:4000/api/user/rejectEmail/${newuser._id}`;
 
       const mailOptions = {
         from: process.env.EMAIL,
@@ -140,12 +139,12 @@ const rejectURL = `http://localhost:4000/api/user/rejectEmail/${newuser._id}`;
         { expiresIn: '1h' },
       );
 
-      // Set the token in an HTTP-only cookie
-      res.cookie('token', token, {
-        httpOnly: true,
-        secure: false, // Set to true for production
-        sameSite: 'lax', // Recommended for local development
-      });
+      // // Set the token in an HTTP-only cookie
+      // res.cookie('token', token, {
+      //   httpOnly: true,
+      //   secure: false, // Set to true for production
+      //   sameSite: 'lax', // Recommended for local development
+      // });
 
       return res.status(200).json({
         message: 'Login successful',
@@ -194,6 +193,8 @@ const rejectURL = `http://localhost:4000/api/user/rejectEmail/${newuser._id}`;
         role: user.role, // Assuming 'role' is stored in your user schema
         name: user.username, // Adjust based on your schema
         email: user.email, // Adjust based on your schema
+        phone: user.phone || null,
+        address: user.address || null,
       });
     } catch (err) {
       console.error('Error fetching user:', err);

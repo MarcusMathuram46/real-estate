@@ -4,12 +4,16 @@ const { MONGODB_URL, PORT } = require('./config');
 const loginRoutes = require('./Route/userRoutes.js');
 const serviceRequestRoutes = require('./Route/serviceRequestRoutes.js');
 const adminRoutes = require('./Route/Admin.js');
+const documentRoutes = require('./Route/documentRoutes.js');
 const cors = require('cors');
 const app = express();
+const path = require('path');
 app.use(express.json());
 
 app.use(cors());
 
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+app.use("/api/documents", documentRoutes);
 app.use("/api/user", loginRoutes);
 app.use("/api/requests", serviceRequestRoutes);
 app.use("/api/admin", adminRoutes);
