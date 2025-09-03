@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { motion, AnimatePresence } from 'framer-motion';
 
 function AdminDocuments() {
   const [documents, setDocuments] = useState([]);
 
   const fetchDocuments = async () => {
     try {
-      const res = await axios.get("http://localhost:4000/api/documents");
+      const res = await axios.get('http://localhost:4000/api/documents');
       setDocuments(res.data);
     } catch (error) {
-      console.error("Error fetching documents:", error);
+      console.error('Error fetching documents:', error);
     }
   };
 
@@ -21,7 +21,7 @@ function AdminDocuments() {
       });
       fetchDocuments();
     } catch (error) {
-      console.error("Error updating status:", error);
+      console.error('Error updating status:', error);
     }
   };
 
@@ -51,66 +51,69 @@ function AdminDocuments() {
               <th className="p-3 border">Action</th>
             </tr>
           </thead>
-          <AnimatePresence component="tbody">
-            {documents.map((doc, idx) => (
-              <motion.tr
-                key={doc._id}
-                className="text-center hover:bg-gray-50 transition"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ delay: idx * 0.05 }}
-              >
-                <td className="p-3 border font-medium text-gray-800">
-                  {doc.name}
-                </td>
-                <td className="p-3 border space-y-1">
-                  {doc.files.map((file, idx2) => (
-                    <a
-                      key={idx2}
-                      href={`http://localhost:4000${file.path}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="block text-blue-600 hover:text-blue-800 underline transition"
+
+          <tbody>
+            <AnimatePresence>
+              {documents.map((doc, idx) => (
+                <motion.tr
+                  key={doc._id}
+                  className="text-center hover:bg-gray-50 transition"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ delay: idx * 0.05 }}
+                >
+                  <td className="p-3 border font-medium text-gray-800">
+                    {doc.name}
+                  </td>
+                  <td className="p-3 border space-y-1">
+                    {doc.files.map((file, idx2) => (
+                      <a
+                        key={idx2}
+                        href={`http://localhost:4000${file.path}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="block text-blue-600 hover:text-blue-800 underline transition"
+                      >
+                        {file.filename}
+                      </a>
+                    ))}
+                  </td>
+                  <td className="p-3 border">
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                        doc.status === 'Approved'
+                          ? 'bg-green-100 text-green-700'
+                          : doc.status === 'Rejected'
+                          ? 'bg-red-100 text-red-700'
+                          : 'bg-yellow-100 text-yellow-700'
+                      }`}
                     >
-                      {file.filename}
-                    </a>
-                  ))}
-                </td>
-                <td className="p-3 border">
-                  <span
-                    className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                      doc.status === "Approved"
-                        ? "bg-green-100 text-green-700"
-                        : doc.status === "Rejected"
-                        ? "bg-red-100 text-red-700"
-                        : "bg-yellow-100 text-yellow-700"
-                    }`}
-                  >
-                    {doc.status}
-                  </span>
-                </td>
-                <td className="p-3 border">
-                  <motion.button
-                    whileTap={{ scale: 0.9 }}
-                    whileHover={{ scale: 1.05 }}
-                    onClick={() => handleStatusChange(doc._id, "Approved")}
-                    className="px-4 py-1 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 mr-2"
-                  >
-                    ✅ Approve
-                  </motion.button>
-                  <motion.button
-                    whileTap={{ scale: 0.9 }}
-                    whileHover={{ scale: 1.05 }}
-                    onClick={() => handleStatusChange(doc._id, "Rejected")}
-                    className="px-4 py-1 bg-red-600 text-white rounded-lg shadow hover:bg-red-700"
-                  >
-                    ❌ Reject
-                  </motion.button>
-                </td>
-              </motion.tr>
-            ))}
-          </AnimatePresence>
+                      {doc.status}
+                    </span>
+                  </td>
+                  <td className="p-3 border">
+                    <motion.button
+                      whileTap={{ scale: 0.9 }}
+                      whileHover={{ scale: 1.05 }}
+                      onClick={() => handleStatusChange(doc._id, 'Approved')}
+                      className="px-4 py-1 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 mr-2"
+                    >
+                      ✅ Approve
+                    </motion.button>
+                    <motion.button
+                      whileTap={{ scale: 0.9 }}
+                      whileHover={{ scale: 1.05 }}
+                      onClick={() => handleStatusChange(doc._id, 'Rejected')}
+                      className="px-4 py-1 bg-red-600 text-white rounded-lg shadow hover:bg-red-700"
+                    >
+                      ❌ Reject
+                    </motion.button>
+                  </td>
+                </motion.tr>
+              ))}
+            </AnimatePresence>
+          </tbody>
         </table>
       </div>
     </div>

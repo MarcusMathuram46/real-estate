@@ -15,26 +15,32 @@ function AdminServices() {
 
   // Fetch all service requests
   const fetchRequests = async () => {
-    try {
-      const res = await fetch('http://localhost:4000/api/requests');
-      const data = await res.json();
-      console.log('Fetched data:', data);
+  try {
+    const token = localStorage.getItem("authToken"); // or from cookies
+    const res = await fetch("http://localhost:4000/api/requests", {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`, // ✅ send token
+      },
+    });
 
-      // Ensure it's always an array
-      if (Array.isArray(data)) {
-        setRequests(data);
-      } else if (data.requests && Array.isArray(data.requests)) {
-        setRequests(data.requests);
-      } else {
-        setRequests([]);
-      }
+    const data = await res.json();
+    console.log("Fetched data:", data);
 
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching requests:', error);
-      setLoading(false);
+    if (Array.isArray(data)) {
+      setRequests(data);
+    } else if (data.requests && Array.isArray(data.requests)) {
+      setRequests(data.requests);
+    } else {
+      setRequests([]);
     }
-  };
+    setLoading(false);
+  } catch (error) {
+    console.error("Error fetching requests:", error);
+    setLoading(false);
+  }
+};
+
 
   useEffect(() => {
     fetchRequests();
@@ -42,17 +48,30 @@ function AdminServices() {
 
   // Delete request
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this request?'))
+  if (!window.confirm('Are you sure you want to delete this request?'))
+    return;
+  try {
+    const token = localStorage.getItem("authToken"); // or from cookies
+    const res = await fetch(`http://localhost:4000/api/requests/${id}`, {
+      method: 'DELETE',
+      headers: {
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+
+    if (res.status === 401) {
+      alert("Unauthorized! Please login again.");
       return;
-    try {
-      await fetch(`http://localhost:4000/api/requests/${id}`, {
-        method: 'DELETE',
-      });
-      setRequests(requests.filter((req) => req._id !== id));
-    } catch (error) {
-      console.error('Delete failed:', error);
     }
-  };
+
+    if (res.ok) {
+      setRequests(requests.filter((req) => req._id !== id));
+    }
+  } catch (error) {
+    console.error('Delete failed:', error);
+  }
+};
+
 
   // Edit request
   const handleEdit = (req) => {

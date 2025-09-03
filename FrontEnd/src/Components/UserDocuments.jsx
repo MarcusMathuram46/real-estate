@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { motion, AnimatePresence } from "framer-motion";
-import { Upload, FileText, CheckCircle, XCircle } from "lucide-react";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Upload, FileText, CheckCircle, XCircle } from 'lucide-react';
 
 function UserDocuments() {
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -18,14 +18,14 @@ function UserDocuments() {
     setLoading(true);
     const formData = new FormData();
     for (let i = 0; i < selectedFiles.length; i++) {
-      formData.append("documents", selectedFiles[i]);
+      formData.append('documents', selectedFiles[i]);
     }
-    formData.append("userId", "USER123"); // Replace with actual userId
-    formData.append("name", "John Doe");
+    formData.append('userId', 'USER123'); // Replace with actual userId
+    formData.append('name', 'John Doe');
 
     try {
-      await axios.post("http://localhost:4000/api/documents/upload", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+      await axios.post('http://localhost:4000/api/documents/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
       setSelectedFiles([]);
       fetchDocuments();
@@ -37,7 +37,7 @@ function UserDocuments() {
   };
 
   const fetchDocuments = async () => {
-    const res = await axios.get("http://localhost:4000/api/documents");
+    const res = await axios.get('http://localhost:4000/api/documents');
     setDocuments(res.data);
   };
 
@@ -72,11 +72,11 @@ function UserDocuments() {
           onClick={handleUpload}
           disabled={loading}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-white font-medium shadow ${
-            loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
+            loading ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'
           }`}
         >
           <Upload size={18} />
-          {loading ? "Uploading..." : "Upload"}
+          {loading ? 'Uploading...' : 'Upload'}
         </motion.button>
       </motion.div>
 
@@ -97,9 +97,9 @@ function UserDocuments() {
         <tbody>
           <AnimatePresence>
             {documents.map((doc) =>
-              doc.files.map((file, index) => (
+              doc.files.map((file) => (
                 <motion.tr
-                  key={index}
+                  key={`${doc._id}-${file.filename}`} // Unique key
                   className="border-t text-gray-700 hover:bg-gray-50"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -118,11 +118,11 @@ function UserDocuments() {
                     </a>
                   </td>
                   <td className="p-3 text-center">
-                    {doc.status === "Approved" ? (
+                    {doc.status === 'Approved' ? (
                       <span className="flex items-center justify-center gap-1 text-green-600 font-semibold">
                         <CheckCircle size={16} /> Approved
                       </span>
-                    ) : doc.status === "Rejected" ? (
+                    ) : doc.status === 'Rejected' ? (
                       <span className="flex items-center justify-center gap-1 text-red-600 font-semibold">
                         <XCircle size={16} /> Rejected
                       </span>
@@ -133,7 +133,7 @@ function UserDocuments() {
                     )}
                   </td>
                 </motion.tr>
-              ))
+              )),
             )}
           </AnimatePresence>
         </tbody>

@@ -16,6 +16,7 @@ const createServiceRequest = async (req, res) => {
     }
 
     const newRequest = new ServiceRequest({
+      userId: req.userid || null,
       name,
       email,
       phone,
@@ -79,18 +80,23 @@ const deleteServiceRequest = async (req, res) => {
   }
 };
 // Get requests of logged-in user
+// Get requests of logged-in user
 const getMyRequests = async (req, res) => {
   try {
-    const { email } = req.user; // assume user info is available in req.user after auth middleware
-    if (!email) return res.status(400).json({ message: "User email not found" });
+    if (!req.userid) {
+      return res.status(400).json({ message: "User ID not found" });
+    }
 
-    const myRequests = await ServiceRequest.find({ email }).sort({ createdAt: -1 });
+    const myRequests = await ServiceRequest.find({ userId: req.userid })
+      .sort({ createdAt: -1 });
+
     res.json(myRequests);
   } catch (err) {
     console.error("Error fetching user requests:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 module.exports = {
   createServiceRequest,

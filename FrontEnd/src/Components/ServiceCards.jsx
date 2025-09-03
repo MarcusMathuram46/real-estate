@@ -1,27 +1,27 @@
-import React, { useState, useEffect } from "react";
-import { QRCodeCanvas } from "qrcode.react";
+import React, { useState, useEffect } from 'react';
+import { QRCodeCanvas } from 'qrcode.react';
 
 function ServiceCards() {
   const [services, setServices] = useState([]);
   const [selectedService, setSelectedService] = useState(null);
   const [step, setStep] = useState(null); // "buy" -> payment, "form" -> form
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    service: "",
-    paymentId: "",
+    name: '',
+    email: '',
+    phone: '',
+    service: '',
+    paymentId: '',
   });
 
   // 👉 Fetch dynamic services
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const res = await fetch("http://localhost:4000/api/services");
+        const res = await fetch('http://localhost:4000/api/services');
         const data = await res.json();
         setServices(data);
       } catch (err) {
-        console.error("Error fetching services:", err);
+        console.error('Error fetching services:', err);
       }
     };
     fetchServices();
@@ -29,10 +29,10 @@ function ServiceCards() {
 
   const handleBuyNow = (service) => {
     setSelectedService(service);
-    setStep("buy");
+    setStep('buy');
   };
 
-  const handlePaymentDone = () => setStep("form");
+  const handlePaymentDone = () => setStep('form');
 
   const handleFormChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -47,24 +47,26 @@ function ServiceCards() {
     };
 
     try {
-      const res = await fetch("http://localhost:4000/api/requests", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('http://localhost:4000/api/requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }, // no token needed
         body: JSON.stringify(requestData),
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        alert(`✅ Your request for ${selectedService.title} has been submitted!`);
+        alert(
+          `✅ Your request for ${selectedService.title} has been submitted!`,
+        );
         setStep(null);
-        setFormData({ name: "", email: "", phone: "", paymentId: "" });
+        setFormData({ name: '', email: '', phone: '', paymentId: '' });
       } else {
         alert(`❌ Error: ${data.message}`);
       }
     } catch (error) {
-      console.error("Submission error:", error);
-      alert("⚠️ Server error. Please try again.");
+      console.error('Submission error:', error);
+      alert('⚠️ Server error. Please try again.');
     }
   };
 
@@ -99,7 +101,7 @@ function ServiceCards() {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-6 rounded-xl shadow-xl w-96">
             {/* Step 1: Payment */}
-            {step === "buy" && (
+            {step === 'buy' && (
               <>
                 <h2 className="text-xl font-bold text-gray-800 mb-4">
                   Pay ₹{selectedService.price} for {selectedService.title}
@@ -129,7 +131,7 @@ function ServiceCards() {
             )}
 
             {/* Step 2: Form */}
-            {step === "form" && (
+            {step === 'form' && (
               <>
                 <h2 className="text-xl font-bold text-gray-800 mb-4">
                   Request for {selectedService.title}

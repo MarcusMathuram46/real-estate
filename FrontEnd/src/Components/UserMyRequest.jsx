@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { motion, AnimatePresence } from "framer-motion";
-import { Pencil, Trash2, Eye } from "lucide-react";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Pencil, Trash2, Eye } from 'lucide-react';
 
 function UserMyRequest() {
   const [requests, setRequests] = useState([]);
@@ -11,41 +11,52 @@ function UserMyRequest() {
   useEffect(() => {
     const fetchRequests = async () => {
       try {
-        const res = await axios.get("http://localhost:4000/api/requests/my"); // backend filters by logged-in user
-        // Ensure an array
+        const res = await axios.get('http://localhost:4000/api/requests/my', {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          },
+        });
         setRequests(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
-        console.error("Error fetching requests:", err);
+        console.error('Error fetching requests:', err);
         setRequests([]);
       } finally {
         setLoading(false);
       }
     };
+
     fetchRequests();
+    const interval = setInterval(fetchRequests, 5000); // poll every 5s
+    return () => clearInterval(interval);
   }, []);
 
   // ✅ Delete request
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this request?")) return;
+    if (!window.confirm('Are you sure you want to delete this request?'))
+      return;
     try {
       await axios.delete(`http://localhost:4000/api/requests/${id}`);
       setRequests((prev) => prev.filter((req) => req._id !== id));
     } catch (err) {
-      console.error("Error deleting request:", err);
+      console.error('Error deleting request:', err);
     }
   };
 
   // ✅ Update request
   const handleUpdate = async (id) => {
-    const newMessage = prompt("Enter new message:");
+    const newMessage = prompt('Enter new message:');
     if (!newMessage) return;
     try {
-      const res = await axios.put(`http://localhost:4000/api/requests/${id}`, { message: newMessage });
+      const res = await axios.put(`http://localhost:4000/api/requests/${id}`, {
+        message: newMessage,
+      });
       setRequests((prev) =>
-        prev.map((req) => (req._id === id ? res.data.updatedRequest || res.data : req))
+        prev.map((req) =>
+          req._id === id ? res.data.updatedRequest || res.data : req,
+        ),
       );
     } catch (err) {
-      console.error("Error updating request:", err);
+      console.error('Error updating request:', err);
     }
   };
 
@@ -99,23 +110,25 @@ function UserMyRequest() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                   >
-                    <td className="p-4 font-medium text-gray-700">{req.service}</td>
+                    <td className="p-4 font-medium text-gray-700">
+                      {req.service}
+                    </td>
                     <td className="p-4 text-gray-600">{req.message}</td>
                     <td className="p-4">
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          req.status === "approved"
-                            ? "bg-green-100 text-green-600"
-                            : req.status === "rejected"
-                            ? "bg-red-100 text-red-600"
-                            : "bg-yellow-100 text-yellow-600"
+                          req.status === 'approved'
+                            ? 'bg-green-100 text-green-600'
+                            : req.status === 'rejected'
+                            ? 'bg-red-100 text-red-600'
+                            : 'bg-yellow-100 text-yellow-600'
                         }`}
                       >
-                        {req.status || "Pending"}
+                        {req.status || 'Pending'}
                       </span>
                     </td>
                     <td className="p-4 text-gray-500 break-words max-w-xs">
-                      {req.adminReply || "Pending"}
+                      {req.adminReply || 'Pending'}
                     </td>
                     <td className="p-4">
                       {req.file ? (
@@ -128,7 +141,7 @@ function UserMyRequest() {
                           <Eye size={18} /> View
                         </a>
                       ) : (
-                        "—"
+                        '—'
                       )}
                     </td>
                     <td className="p-4 flex gap-3 flex-wrap">
