@@ -1,12 +1,18 @@
-const ServiceRequest =require("../Model/ServiceRequest.js");
+const ServiceRequest = require("../Model/ServiceRequest.js");
 
 // Create new service request
 const createServiceRequest = async (req, res) => {
   try {
-    const { name, email, phone, service, cost, paymentId } = req.body;
+    const { name, email, phone, service, message, cost, paymentId } = req.body;
 
-    if (!name || !email || !phone || !service || !cost || !paymentId) {
-      return res.status(400).json({ message: "All fields are required" });
+    // basic validation
+    if (!name || !email || !phone || !service) {
+      return res.status(400).json({ message: "Name, Email, Phone & Service are required" });
+    }
+
+    // Paid request (ServiceCards) → require cost & paymentId
+    if (cost && !paymentId) {
+      return res.status(400).json({ message: "PaymentId is required for paid requests" });
     }
 
     const newRequest = new ServiceRequest({
@@ -14,6 +20,7 @@ const createServiceRequest = async (req, res) => {
       email,
       phone,
       service,
+      message,
       cost,
       paymentId,
     });
@@ -36,17 +43,13 @@ const getAllRequests = async (req, res) => {
   }
 };
 
-// update
+// Update request
 const updateServiceRequest = async (req, res) => {
   try {
     const { id } = req.params;
     const updatedData = req.body;
 
-    const updatedRequest = await ServiceRequest.findByIdAndUpdate(
-      id,
-      updatedData,
-      { new: true }
-    );
+    const updatedRequest = await ServiceRequest.findByIdAndUpdate(id, updatedData, { new: true });
 
     if (!updatedRequest) {
       return res.status(404).json({ message: "Request not found" });
@@ -59,7 +62,7 @@ const updateServiceRequest = async (req, res) => {
   }
 };
 
-// Delete a service request
+// Delete request
 const deleteServiceRequest = async (req, res) => {
   try {
     const { id } = req.params;
@@ -75,4 +78,24 @@ const deleteServiceRequest = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-module.exports={ createServiceRequest, getAllRequests, updateServiceRequest, deleteServiceRequest };
+// Get requests of logged-in user
+const getMyRequests = async (req, res) => {
+  try {
+    const { email } = req.user; // assume user info is available in req.user after auth middleware
+    if (!email) return res.status(400).json({ message: "User email not found" });
+
+    const myRequests = await ServiceRequest.find({ email }).sort({ createdAt: -1 });
+    res.json(myRequests);
+  } catch (err) {
+    console.error("Error fetching user requests:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports = {
+  createServiceRequest,
+  getAllRequests,
+  updateServiceRequest,
+  deleteServiceRequest,
+  getMyRequests,
+};

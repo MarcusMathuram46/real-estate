@@ -36,8 +36,7 @@ const Admincontroller = {
       await newuser.save();
 
       const approveURL = `http://localhost:4000/api/admin/approveEmail/${newuser._id}`;
-const rejectURL = `http://localhost:4000/api/admin/rejectEmail/${newuser._id}`;
-
+      const rejectURL = `http://localhost:4000/api/admin/rejectEmail/${newuser._id}`;
 
       const mailOptions = {
         from: process.env.EMAIL,
@@ -78,11 +77,11 @@ const rejectURL = `http://localhost:4000/api/admin/rejectEmail/${newuser._id}`;
   },
   getallrole: async (req, res) => {
     try {
-      const alldata = await Login.find({}, 'username email role');
+      const alldata = await Login.find({}, 'username email role phone');
 
       res.status(200).json(alldata);
     } catch (error) {
-      res.status(400).json({ meaasge: error.message });
+      res.status(400).json({ message: error.message });
     }
   },
 
@@ -342,10 +341,10 @@ const rejectURL = `http://localhost:4000/api/admin/rejectEmail/${newuser._id}`;
       }
 
       // Ensure only "Super Admin" can delete users
-      if (loggedInAdmin.role !== 'Super Admin') {
-        return res.status(403).json({
-          message: 'Access denied: Only Super Admin can delete users',
-        });
+      if (loggedInAdmin.role.toLowerCase() !== 'admin') {
+        return res
+          .status(403)
+          .json({ message: 'Access denied: Only Admin can delete users' });
       }
 
       const userToDelete = await Login.findById(id);

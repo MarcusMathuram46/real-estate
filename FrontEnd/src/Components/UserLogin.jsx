@@ -31,7 +31,7 @@ function UserLogin() {
         // ✅ Save token & role
         localStorage.setItem('authToken', info.token);
         localStorage.setItem('role', info.role);
-
+        localStorage.setItem('user', JSON.stringify(info.user)); // <---- added
         setMsg('✅ Login Successful');
 
         // ✅ Redirect based on role

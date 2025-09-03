@@ -1,21 +1,37 @@
-import React, { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 function AdminServices() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
-  const [formData, setFormData] = useState({ name: "", email: "", phone: "", service: "", paymentId: "" });
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    service: '',
+    paymentId: '',
+  });
 
   // Fetch all service requests
   const fetchRequests = async () => {
     try {
-      const res = await fetch("http://localhost:4000/api/requests");
+      const res = await fetch('http://localhost:4000/api/requests');
       const data = await res.json();
-      setRequests(data);
+      console.log('Fetched data:', data);
+
+      // Ensure it's always an array
+      if (Array.isArray(data)) {
+        setRequests(data);
+      } else if (data.requests && Array.isArray(data.requests)) {
+        setRequests(data.requests);
+      } else {
+        setRequests([]);
+      }
+
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching requests:", error);
+      console.error('Error fetching requests:', error);
       setLoading(false);
     }
   };
@@ -26,12 +42,15 @@ function AdminServices() {
 
   // Delete request
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this request?")) return;
+    if (!window.confirm('Are you sure you want to delete this request?'))
+      return;
     try {
-      await fetch(`http://localhost:4000/api/requests/${id}`, { method: "DELETE" });
+      await fetch(`http://localhost:4000/api/requests/${id}`, {
+        method: 'DELETE',
+      });
       setRequests(requests.filter((req) => req._id !== id));
     } catch (error) {
-      console.error("Delete failed:", error);
+      console.error('Delete failed:', error);
     }
   };
 
@@ -45,8 +64,8 @@ function AdminServices() {
     e.preventDefault();
     try {
       const res = await fetch(`http://localhost:4000/api/requests/${editing}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
       if (res.ok) {
@@ -54,7 +73,7 @@ function AdminServices() {
         setEditing(null);
       }
     } catch (error) {
-      console.error("Update failed:", error);
+      console.error('Update failed:', error);
     }
   };
 
@@ -142,12 +161,16 @@ function AdminServices() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
             >
-              <h3 className="text-xl font-bold mb-4 text-gray-800">Edit Request</h3>
+              <h3 className="text-xl font-bold mb-4 text-gray-800">
+                Edit Request
+              </h3>
               <form onSubmit={handleUpdate} className="space-y-3">
                 <input
                   type="text"
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
                   className="w-full p-2 border rounded-lg"
                   placeholder="Name"
                   required
@@ -155,7 +178,9 @@ function AdminServices() {
                 <input
                   type="email"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
                   className="w-full p-2 border rounded-lg"
                   placeholder="Email"
                   required
@@ -163,7 +188,9 @@ function AdminServices() {
                 <input
                   type="tel"
                   value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, phone: e.target.value })
+                  }
                   className="w-full p-2 border rounded-lg"
                   placeholder="Phone"
                   required
@@ -171,7 +198,9 @@ function AdminServices() {
                 <input
                   type="text"
                   value={formData.service}
-                  onChange={(e) => setFormData({ ...formData, service: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, service: e.target.value })
+                  }
                   className="w-full p-2 border rounded-lg"
                   placeholder="Service"
                   required
@@ -179,7 +208,9 @@ function AdminServices() {
                 <input
                   type="text"
                   value={formData.paymentId}
-                  onChange={(e) => setFormData({ ...formData, paymentId: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, paymentId: e.target.value })
+                  }
                   className="w-full p-2 border rounded-lg"
                   placeholder="Payment ID"
                   required

@@ -19,6 +19,13 @@ const AdminServices = lazy(() => import("./Components/AdminServices"));
 const AdminDocuments = lazy(() => import("./Components/AdminDocuments"));
 const UserDocuments = lazy(() => import("./Components/UserDocuments"));
 const UserProfile = lazy(() => import("./Components/UserProfile"));
+const UserMyRequest = lazy(() => import("./Components/UserMyRequest"));
+const UserSendRequest = lazy(() => import("./Components/UserSendRequest"));
+const AdminRequest = lazy(() => import("./Components/AdminRequest"));
+const AdminAddServices = lazy(() => import("./Components/AdminAddServices"));
+const AdminManagement = lazy(() => import("./Components/AdminManagement"));
+
+
 
 // ✅ Protected Route Component
 const ProtectedRoute = ({ children, allowedRole }) => {
@@ -72,6 +79,8 @@ function App() {
             <Route path="dashboard" element={<UserDashboard />} />
             <Route path="documents" element={<UserDocuments />} />
             <Route path="profile" element={<UserProfile />} />
+            <Route path="requests" element={<UserMyRequest />} />
+            <Route path="send-request" element={<UserSendRequest />} />
           </Route>
 
           {/* 🛠️ Admin Routes */}
@@ -86,7 +95,9 @@ function App() {
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="services" element={<AdminServices />} />
             <Route path="documents" element={<AdminDocuments />} />
-            
+            <Route path="requests" element={<AdminRequest />} />
+            <Route path="add-services" element={<AdminAddServices />} />
+            <Route path="users" element={<AdminManagement />} />
           </Route>
 
           {/* 🚧 Catch-all route */}

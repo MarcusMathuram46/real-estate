@@ -5,18 +5,23 @@ const loginRoutes = require('./Route/userRoutes.js');
 const serviceRequestRoutes = require('./Route/serviceRequestRoutes.js');
 const adminRoutes = require('./Route/Admin.js');
 const documentRoutes = require('./Route/documentRoutes.js');
+const serviceRoutes = require("./Route/serviceRoutes.js");
 const cors = require('cors');
 const app = express();
 const path = require('path');
 app.use(express.json());
 
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173", // ✅ Explicitly allow frontend
+  credentials: true,               // ✅ Allow cookies/tokens
+}));
 
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 app.use("/api/documents", documentRoutes);
 app.use("/api/user", loginRoutes);
 app.use("/api/requests", serviceRequestRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/services", serviceRoutes);
 
 mongoose.connect(MONGODB_URL)
 .then(() => {

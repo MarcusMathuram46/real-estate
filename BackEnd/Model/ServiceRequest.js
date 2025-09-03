@@ -1,4 +1,4 @@
-const mongoose =require("mongoose");
+const mongoose = require("mongoose");
 
 const serviceRequestSchema = new mongoose.Schema(
   {
@@ -6,8 +6,9 @@ const serviceRequestSchema = new mongoose.Schema(
     email: { type: String, required: true },
     phone: { type: String, required: true },
     service: { type: String, required: true },
-    cost: { type: Number, required: true },
-    paymentId: { type: String, required: true }, // ✅ Payment ID
+    message: { type: String }, // ✅ for UserSendRequest
+    cost: { type: Number }, // ✅ optional for free/manual request
+    paymentId: { type: String }, // ✅ optional for paid request
   },
   { timestamps: true }
 );

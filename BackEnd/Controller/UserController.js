@@ -15,7 +15,7 @@ const Usercontroller = {
       // console.log('register login');
       // console.log(req.body);
 
-      const { username, email, password, role } = req.body;
+      const { username, email, password, role, phone } = req.body;
 
       const verifyemail = await Login.findOne({ email: email });
       // console.log(verifyemail);
@@ -30,6 +30,7 @@ const Usercontroller = {
         email,
         password: hashpassword,
         role,
+        phone,
         status: 'pending',
       });
 
@@ -77,7 +78,7 @@ const Usercontroller = {
   },
   getallrole: async (req, res) => {
     try {
-      const alldata = await Login.find({}, 'username email role');
+      const alldata = await Login.find({}, 'username email role phone');
 
       res.status(200).json(alldata);
     } catch (error) {

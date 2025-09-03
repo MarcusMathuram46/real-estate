@@ -5,15 +5,20 @@ import { Pencil, Trash2, Eye } from "lucide-react";
 
 function UserMyRequest() {
   const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // ✅ Fetch requests
   useEffect(() => {
     const fetchRequests = async () => {
       try {
-        const res = await axios.get("/api/requests/my"); // backend filters by logged-in user
-        setRequests(res.data);
+        const res = await axios.get("http://localhost:4000/api/requests/my"); // backend filters by logged-in user
+        // Ensure an array
+        setRequests(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching requests:", err);
+        setRequests([]);
+      } finally {
+        setLoading(false);
       }
     };
     fetchRequests();
@@ -21,29 +26,44 @@ function UserMyRequest() {
 
   // ✅ Delete request
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this request?")) {
-      try {
-        await axios.delete(`/api/requests/${id}`);
-        setRequests((prev) => prev.filter((req) => req._id !== id));
-      } catch (err) {
-        console.error(err);
-      }
+    if (!window.confirm("Are you sure you want to delete this request?")) return;
+    try {
+      await axios.delete(`http://localhost:4000/api/requests/${id}`);
+      setRequests((prev) => prev.filter((req) => req._id !== id));
+    } catch (err) {
+      console.error("Error deleting request:", err);
     }
   };
 
-  // ✅ Update request (simple example, can be replaced with modal)
+  // ✅ Update request
   const handleUpdate = async (id) => {
     const newMessage = prompt("Enter new message:");
     if (!newMessage) return;
     try {
-      const res = await axios.put(`/api/requests/${id}`, { message: newMessage });
+      const res = await axios.put(`http://localhost:4000/api/requests/${id}`, { message: newMessage });
       setRequests((prev) =>
-        prev.map((req) => (req._id === id ? res.data : req))
+        prev.map((req) => (req._id === id ? res.data.updatedRequest || res.data : req))
       );
     } catch (err) {
-      console.error(err);
+      console.error("Error updating request:", err);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (requests.length === 0) {
+    return (
+      <div className="text-center mt-20 text-gray-500 text-lg">
+        You have no service requests yet.
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -52,7 +72,7 @@ function UserMyRequest() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <h2 className="text-3xl font-bold mb-6 text-gray-800">
+      <h2 className="text-3xl font-bold mb-6 text-gray-800 text-center">
         📄 My Service Requests
       </h2>
 
@@ -70,64 +90,63 @@ function UserMyRequest() {
           </thead>
           <AnimatePresence>
             <tbody>
-              {requests.map((req) => (
-                <motion.tr
-                  key={req._id}
-                  className="border-b hover:bg-gray-50 transition"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                >
-                  <td className="p-4 font-medium text-gray-700">
-                    {req.service}
-                  </td>
-                  <td className="p-4 text-gray-600">{req.message}</td>
-                  <td className="p-4">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        req.status === "approved"
-                          ? "bg-green-100 text-green-600"
-                          : req.status === "rejected"
-                          ? "bg-red-100 text-red-600"
-                          : "bg-yellow-100 text-yellow-600"
-                      }`}
-                    >
-                      {req.status}
-                    </span>
-                  </td>
-                  <td className="p-4 text-gray-500">
-                    {req.adminReply || "Pending"}
-                  </td>
-                  <td className="p-4">
-                    {req.file ? (
-                      <a
-                        href={req.file}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="flex items-center gap-2 text-blue-600 hover:underline"
+              {Array.isArray(requests) &&
+                requests.map((req) => (
+                  <motion.tr
+                    key={req._id}
+                    className="border-b hover:bg-gray-50 transition"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                  >
+                    <td className="p-4 font-medium text-gray-700">{req.service}</td>
+                    <td className="p-4 text-gray-600">{req.message}</td>
+                    <td className="p-4">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                          req.status === "approved"
+                            ? "bg-green-100 text-green-600"
+                            : req.status === "rejected"
+                            ? "bg-red-100 text-red-600"
+                            : "bg-yellow-100 text-yellow-600"
+                        }`}
                       >
-                        <Eye size={18} /> View
-                      </a>
-                    ) : (
-                      "—"
-                    )}
-                  </td>
-                  <td className="p-4 flex gap-3">
-                    <button
-                      onClick={() => handleUpdate(req._id)}
-                      className="p-2 rounded-full bg-blue-100 hover:bg-blue-200 transition"
-                    >
-                      <Pencil size={18} className="text-blue-600" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(req._id)}
-                      className="p-2 rounded-full bg-red-100 hover:bg-red-200 transition"
-                    >
-                      <Trash2 size={18} className="text-red-600" />
-                    </button>
-                  </td>
-                </motion.tr>
-              ))}
+                        {req.status || "Pending"}
+                      </span>
+                    </td>
+                    <td className="p-4 text-gray-500 break-words max-w-xs">
+                      {req.adminReply || "Pending"}
+                    </td>
+                    <td className="p-4">
+                      {req.file ? (
+                        <a
+                          href={req.file}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex items-center gap-2 text-blue-600 hover:underline"
+                        >
+                          <Eye size={18} /> View
+                        </a>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+                    <td className="p-4 flex gap-3 flex-wrap">
+                      <button
+                        onClick={() => handleUpdate(req._id)}
+                        className="p-2 rounded-full bg-blue-100 hover:bg-blue-200 transition"
+                      >
+                        <Pencil size={18} className="text-blue-600" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(req._id)}
+                        className="p-2 rounded-full bg-red-100 hover:bg-red-200 transition"
+                      >
+                        <Trash2 size={18} className="text-red-600" />
+                      </button>
+                    </td>
+                  </motion.tr>
+                ))}
             </tbody>
           </AnimatePresence>
         </table>

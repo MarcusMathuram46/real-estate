@@ -5,12 +5,12 @@ import { CheckCircle, XCircle, Trash2, Reply } from "lucide-react";
 
 function AdminRequests() {
   const [requests, setRequests] = useState([]);
-  const [replyText, setReplyText] = useState("");
+  const [replyText, setReplyText] = useState({}); // ✅ store per-row replies
 
   // Fetch all requests
   const fetchRequests = async () => {
     try {
-      const res = await axios.get("/api/requests"); // backend should return all
+      const res = await axios.get("http://localhost:4000/api/requests"); // backend should return all
       setRequests(res.data);
     } catch (err) {
       console.error(err);
@@ -24,18 +24,23 @@ function AdminRequests() {
   // Update status
   const updateStatus = async (id, status) => {
     try {
-      await axios.put(`/api/requests/${id}`, { status });
+      await axios.put(`http://localhost:4000/api/requests/${id}`, { status });
       fetchRequests();
     } catch (err) {
       console.error(err);
     }
   };
 
-  // Send reply
+  // Handle reply input change (per row)
+  const handleReplyChange = (id, value) => {
+    setReplyText((prev) => ({ ...prev, [id]: value }));
+  };
+
+  // Send reply (per row)
   const sendReply = async (id) => {
     try {
-      await axios.put(`/api/requests/${id}`, { adminReply: replyText });
-      setReplyText("");
+      await axios.put(`http://localhost:4000/api/requests/${id}`, { adminReply: replyText[id] });
+      setReplyText((prev) => ({ ...prev, [id]: "" })); // clear only that row
       fetchRequests();
     } catch (err) {
       console.error(err);
@@ -46,7 +51,7 @@ function AdminRequests() {
   const deleteRequest = async (id) => {
     if (!window.confirm("Are you sure you want to delete this request?")) return;
     try {
-      await axios.delete(`/api/requests/${id}`);
+      await axios.delete(`http://localhost:4000/api/requests/${id}`);
       fetchRequests();
     } catch (err) {
       console.error(err);
@@ -81,15 +86,24 @@ function AdminRequests() {
                 transition={{ duration: 0.3 }}
                 className="border-t hover:bg-gray-50"
               >
-                <td className="p-3">{req.name} <br />📧 {req.email}</td>
+                <td className="p-3">
+                  {req.name} <br />📧 {req.email}
+                </td>
                 <td className="p-3 font-semibold">{req.service}</td>
                 <td className="p-3">{req.message}</td>
                 <td className="p-3">
                   {req.file ? (
-                    <a href={req.file} target="_blank" rel="noreferrer" className="text-blue-600 underline">
+                    <a
+                      href={req.file}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-blue-600 underline"
+                    >
                       View File
                     </a>
-                  ) : "—"}
+                  ) : (
+                    "—"
+                  )}
                 </td>
                 <td className="p-3">
                   <span
@@ -122,8 +136,8 @@ function AdminRequests() {
                     <input
                       type="text"
                       placeholder="Write reply..."
-                      value={replyText}
-                      onChange={(e) => setReplyText(e.target.value)}
+                      value={replyText[req._id] || ""}
+                      onChange={(e) => handleReplyChange(req._id, e.target.value)}
                       className="border p-1 rounded"
                     />
                     <button

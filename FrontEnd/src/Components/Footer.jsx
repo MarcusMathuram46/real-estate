@@ -1,6 +1,11 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn } from "react-icons/fa";
+import React from 'react';
+import { Link } from 'react-router-dom';
+import {
+  FaFacebookF,
+  FaTwitter,
+  FaInstagram,
+  FaLinkedinIn,
+} from 'react-icons/fa';
 
 function Footer() {
   return (
@@ -84,8 +89,9 @@ function Footer() {
         </div>
 
         {/* Divider */}
-        <div className="border-t border-blue-400 mt-8 pt-4 text-center text-sm text-gray-200">
-          © {new Date().getFullYear()} GoodLand. All rights reserved.
+        <div className="border-t border-blue-400 mt-8 pt-4 text-center text-sm text-white-500">
+          Developed by{' '}
+          <span className="font-semibold text-white-600">Marcus Mathuram</span>
         </div>
       </div>
     </footer>

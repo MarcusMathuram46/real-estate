@@ -6,9 +6,18 @@ function AdminAddServices() {
   const [form, setForm] = useState({ title: "", desc: "", price: 100 });
 
   const fetchServices = async () => {
-    const res = await axios.get("/api/services");
+  const res = await axios.get("http://localhost:4000/api/services");
+  // console.log("Fetched services:", res.data); // 👀 check the shape
+
+  if (Array.isArray(res.data)) {
     setServices(res.data);
-  };
+  } else if (res.data.services && Array.isArray(res.data.services)) {
+    setServices(res.data.services);
+  } else {
+    setServices([]); // fallback
+  }
+};
+
 
   useEffect(() => {
     fetchServices();
@@ -16,13 +25,13 @@ function AdminAddServices() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await axios.post("/api/services", form);
+    await axios.post("http://localhost:4000/api/services", form);
     setForm({ title: "", desc: "", price: 100 });
     fetchServices();
   };
 
   const deleteService = async (id) => {
-    await axios.delete(`/api/services/${id}`);
+    await axios.delete(`http://localhost:4000/api/services/${id}`);
     fetchServices();
   };
 

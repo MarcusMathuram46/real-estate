@@ -21,6 +21,8 @@ function AdminSidebar() {
     { title: "Users", icon: <Users size={20} />, path: "/admin/users" },
     { title: "Services", icon: <Users size={20} />, path: "/admin/services" },
     { title: "Documents", icon: <Users size={20} />, path: "/admin/documents" },
+    { title: "Request", icon: <Users size={20} />, path: "/admin/requests" },
+    { title: "Add Services", icon: <Users size={20} />, path: "/admin/add-services" },
   ];
 
   const handleLogout = () => {
