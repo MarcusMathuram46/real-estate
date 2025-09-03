@@ -58,7 +58,7 @@ function UserLogin() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-[#1e293b] via-[#334155] to-[#0f172a]">
       <div className="w-full max-w-md p-8 bg-white shadow-lg rounded-2xl">
         {/* ✅ Back Button */}
         <div className="mb-4">
@@ -120,12 +120,12 @@ function UserLogin() {
             type="submit"
             disabled={loading}
             className={`w-full py-2 rounded-lg font-semibold text-white transition duration-300 
-              ${
-                loading
-                  ? 'bg-blue-400 cursor-not-allowed'
-                  : 'bg-blue-600 hover:bg-blue-700'
-              }
-            `}
+  ${
+    loading
+      ? 'bg-[#93c5fd] cursor-not-allowed'
+      : 'bg-[#2563eb] hover:bg-[#1d4ed8]'
+  }
+`}
           >
             {loading ? 'Logging in...' : 'Login'}
           </button>
@@ -135,7 +135,7 @@ function UserLogin() {
             Don&apos;t have an account?{' '}
             <Link
               to="/user/register"
-              className="text-blue-600 font-semibold hover:underline"
+              className="text-[#2563eb] font-semibold hover:underline"
             >
               Register
             </Link>

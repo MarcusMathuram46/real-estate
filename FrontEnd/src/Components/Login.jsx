@@ -8,14 +8,13 @@ function Login() {
   const navigate = useNavigate();
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-[#1e293b] via-[#334155] to-[#0f172a]">
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.8, ease: 'easeOut' }}
-        className="bg-white p-10 rounded-3xl shadow-2xl flex flex-col items-center space-y-8 w-[22rem]"
+        className="bg-white p-10 rounded-3xl shadow-xl flex flex-col items-center space-y-8 w-[22rem]"
       >
-        {/* ✅ Back Button */}
         <div className="mb-4">
           <BackButton />
         </div>
@@ -28,23 +27,23 @@ function Login() {
           Choose Login
         </motion.h1>
 
-        {/* User Login Button */}
+        {/* User Login */}
         <motion.button
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => navigate('/user/login')}
-          className="w-full flex items-center justify-center space-x-3 py-3 px-6 text-lg font-semibold text-white bg-blue-600 rounded-xl shadow-lg hover:bg-blue-700 transition duration-300"
+          className="w-full flex items-center justify-center space-x-3 py-3 px-6 text-lg font-semibold text-white bg-[#2563eb] rounded-xl shadow-lg hover:bg-[#1d4ed8] transition duration-300"
         >
           <FaUserAlt className="text-2xl animate-bounce" />
           <span>User Login</span>
         </motion.button>
 
-        {/* Admin Login Button */}
+        {/* Admin Login */}
         <motion.button
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => navigate('/admin/login')}
-          className="w-full flex items-center justify-center space-x-3 py-3 px-6 text-lg font-semibold text-white bg-purple-600 rounded-xl shadow-lg hover:bg-purple-700 transition duration-300"
+          className="w-full flex items-center justify-center space-x-3 py-3 px-6 text-lg font-semibold text-white bg-[#7c3aed] rounded-xl shadow-lg hover:bg-[#6d28d9] transition duration-300"
         >
           <FaUserShield className="text-2xl animate-spin-slow" />
           <span>Admin Login</span>

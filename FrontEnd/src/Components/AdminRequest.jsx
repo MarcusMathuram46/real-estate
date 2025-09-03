@@ -38,7 +38,7 @@ function AdminRequests() {
     }
   };
 
-  // Handle reply input change (per row)
+  // Handle reply input change
   const handleReplyChange = (id, value) => {
     setReplyText((prev) => ({ ...prev, [id]: value }));
   };
@@ -75,24 +75,35 @@ function AdminRequests() {
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      <h2 className="text-3xl font-bold mb-6 text-center">📋 Manage User Requests</h2>
+    <motion.div
+      className="p-6 max-w-7xl mx-auto"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+    >
+      <motion.h2
+        className="text-3xl font-extrabold mb-8 text-center bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        📋 Manage User Requests
+      </motion.h2>
 
-      <div className="overflow-x-auto">
-        <table className="w-full border rounded-lg shadow-lg">
-          <thead className="bg-gray-100">
+      <div className="overflow-x-auto rounded-xl shadow-2xl bg-white/70 backdrop-blur-lg">
+        <table className="w-full border-collapse">
+          <thead className="bg-gradient-to-r from-gray-100 to-gray-200">
             <tr>
               <th className="p-3 text-left">User</th>
+              <th className="p-3 text-left">Phone</th>
               <th className="p-3 text-left">Service</th>
               <th className="p-3 text-left">Message</th>
-              <th className="p-3 text-left">File</th>
               <th className="p-3 text-left">Status</th>
               <th className="p-3 text-left">Admin Reply</th>
               <th className="p-3 text-left">Actions</th>
             </tr>
           </thead>
 
-          {/* ✅ Proper tbody wrapping for AnimatePresence */}
           <tbody>
             <AnimatePresence>
               {requests.map((req) => (
@@ -105,71 +116,67 @@ function AdminRequests() {
                   className="border-t hover:bg-gray-50"
                 >
                   <td className="p-3">
-                    {req.name} <br />
-                    📧 {req.email}
+                    <span className="font-semibold">{req.name}</span>
+                    <div className="text-sm text-gray-600">📧 {req.email}</div>
                   </td>
+                  <td className="p-3 text-sm text-gray-700">📱 {req.phone}</td>
                   <td className="p-3 font-semibold">{req.service}</td>
-                  <td className="p-3">{req.message}</td>
+                  <td className="p-3">{req.message || '—'}</td>
                   <td className="p-3">
-                    {req.file ? (
-                      <a
-                        href={req.file}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-blue-600 underline"
-                      >
-                        View File
-                      </a>
-                    ) : '—'}
-                  </td>
-                  <td className="p-3">
-                    <span
-                      className={`px-2 py-1 rounded text-white ${
+                    <motion.span
+                      className={`px-2 py-1 rounded text-white shadow-md ${
                         req.status === 'approved'
                           ? 'bg-green-500'
                           : req.status === 'rejected'
                           ? 'bg-red-500'
                           : 'bg-yellow-500'
                       }`}
+                      initial={{ scale: 0.8 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: "spring", stiffness: 200 }}
                     >
                       {req.status}
-                    </span>
+                    </motion.span>
                   </td>
                   <td className="p-3">{req.adminReply || '—'}</td>
                   <td className="p-3 flex flex-col sm:flex-row gap-2">
-                    <button
+                    <motion.button
+                      whileTap={{ scale: 0.9 }}
                       onClick={() => updateStatus(req._id, 'approved')}
-                      className="flex items-center gap-1 bg-green-100 hover:bg-green-200 px-3 py-1 rounded-lg text-green-700"
+                      className="flex items-center gap-1 bg-green-100 hover:bg-green-200 px-3 py-1 rounded-lg text-green-700 font-medium"
                     >
                       <CheckCircle size={18} /> Approve
-                    </button>
-                    <button
+                    </motion.button>
+                    <motion.button
+                      whileTap={{ scale: 0.9 }}
                       onClick={() => updateStatus(req._id, 'rejected')}
-                      className="flex items-center gap-1 bg-red-100 hover:bg-red-200 px-3 py-1 rounded-lg text-red-700"
+                      className="flex items-center gap-1 bg-red-100 hover:bg-red-200 px-3 py-1 rounded-lg text-red-700 font-medium"
                     >
                       <XCircle size={18} /> Reject
-                    </button>
+                    </motion.button>
                     <div className="flex items-center gap-2">
                       <input
                         type="text"
                         placeholder="Write reply..."
                         value={replyText[req._id] || ''}
                         onChange={(e) => handleReplyChange(req._id, e.target.value)}
-                        className="border p-1 rounded"
+                        className="border p-1 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                       />
-                      <button
+                      <motion.button
+                        whileTap={{ scale: 0.9 }}
                         onClick={() => sendReply(req._id)}
-                        className="flex items-center gap-1 bg-blue-100 hover:bg-blue-200 px-3 py-1 rounded-lg text-blue-700"
+                        className="flex items-center gap-1 bg-blue-100 hover:bg-blue-200 px-3 py-1 rounded-lg text-blue-700 font-medium"
                       >
                         <Reply size={18} /> Send
-                      </button>
+                      </motion.button>
                     </div>
-                    <button
+                    <motion.button
+                      whileTap={{ scale: 0.9 }}
                       onClick={() => deleteRequest(req._id)}
-                      className="flex items-center gap-1 bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-lg text-gray-700"
+                      className="flex items-center gap-1 bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-lg text-gray-700 font-medium"
                     >
                       <Trash2 size={18} /> Delete
-                    </button>
+                    </motion.button>
                   </td>
                 </motion.tr>
               ))}
@@ -177,7 +184,7 @@ function AdminRequests() {
           </tbody>
         </table>
       </div>
-    </div>
+    </motion.div>
   );
 }
 

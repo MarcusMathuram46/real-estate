@@ -60,7 +60,8 @@ function AdminRegister() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-[#1e293b] via-[#334155] to-[#0f172a]">
+
       <div className="w-full max-w-md p-8 bg-white shadow-lg rounded-2xl">
         <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
           Create an Admin Account

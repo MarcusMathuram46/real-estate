@@ -34,7 +34,7 @@ function UserSidebar() {
   return (
     <motion.div
       animate={{ width: isOpen ? "16rem" : "5rem" }}
-      className="h-screen bg-gradient-to-b from-green-700 to-green-900 text-white shadow-2xl flex flex-col relative"
+      className="h-screen bg-gradient-to-br from-[#1e293b] via-[#334155] to-[#0f172a] text-white shadow-2xl flex flex-col relative"
       transition={{ duration: 0.3, type: "spring", stiffness: 120 }}
     >
       {/* Toggle Button */}
