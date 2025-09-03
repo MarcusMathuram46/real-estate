@@ -93,8 +93,22 @@ function UserSendRequest() {
   // 🔹 Submit Service Request
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const token = localStorage.getItem('authToken'); // must exist
+    if (!token) {
+      setToast({
+        type: 'error',
+        message: '❌ You must be logged in to send a request',
+      });
+      return;
+    }
+
     try {
-      await axios.post('http://localhost:4000/api/requests', formData);
+      await axios.post('http://localhost:4000/api/requests', formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setFormData({ service: '', name: '', email: '', phone: '', message: '' });
       setToast({ type: 'success', message: '✅ Request sent successfully!' });
     } catch (err) {

@@ -47,7 +47,7 @@ function ServiceCards() {
     };
 
     try {
-      const res = await fetch('http://localhost:4000/api/requests', {
+      const res = await fetch('http://localhost:4000/api/requests/service', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }, // no token needed
         body: JSON.stringify(requestData),

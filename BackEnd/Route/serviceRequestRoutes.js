@@ -1,6 +1,7 @@
 const express = require("express");
 const {
   createServiceRequest,
+  createService,
   getAllRequests,
   updateServiceRequest,
   deleteServiceRequest,
@@ -12,7 +13,8 @@ const { verifyToken } = require("../Utils/VerifyRole.js"); // ✅ import your au
 const router = express.Router();
 
 // POST → Save new request (public / user can create)
-router.post("/", createServiceRequest);
+router.post("/", verifyToken, createServiceRequest);
+router.post("/service", createService); // Add new service
 
 // GET → Fetch all requests (for admin)
 router.get("/", verifyToken, getAllRequests);

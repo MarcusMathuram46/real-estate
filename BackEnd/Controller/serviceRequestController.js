@@ -33,7 +33,39 @@ const createServiceRequest = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+// Create public service request
+const createService = async (req, res) => {
+  try {
+    const { name, email, phone, service, message, cost, paymentId } = req.body;
 
+    // basic validation
+    if (!name || !email || !phone || !service) {
+      return res.status(400).json({ message: "Name, Email, Phone & Service are required" });
+    }
+
+    // Paid request (ServiceCards) → require cost & paymentId
+    if (cost && !paymentId) {
+      return res.status(400).json({ message: "PaymentId is required for paid requests" });
+    }
+
+    const newRequest = new ServiceRequest({
+      userId: req.userid || null,
+      name,
+      email,
+      phone,
+      service,
+      message,
+      cost,
+      paymentId,
+    });
+
+    await newRequest.save();
+    res.status(201).json({ message: "Request saved successfully", newRequest });
+  } catch (err) {
+    console.error("Error creating request:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 // Get all requests (for admin)
 const getAllRequests = async (req, res) => {
   try {
@@ -80,15 +112,19 @@ const deleteServiceRequest = async (req, res) => {
   }
 };
 // Get requests of logged-in user
-// Get requests of logged-in user
 const getMyRequests = async (req, res) => {
   try {
     if (!req.userid) {
       return res.status(400).json({ message: "User ID not found" });
     }
 
-    const myRequests = await ServiceRequest.find({ userId: req.userid })
-      .sort({ createdAt: -1 });
+    // Fetch user requests either by userId or email
+    const myRequests = await ServiceRequest.find({
+      $or: [
+        { userId: req.userid },
+        { email: req.userEmail } // attach email in token or send in request
+      ]
+    }).sort({ createdAt: -1 });
 
     res.json(myRequests);
   } catch (err) {
@@ -98,8 +134,10 @@ const getMyRequests = async (req, res) => {
 };
 
 
+
 module.exports = {
   createServiceRequest,
+  createService,
   getAllRequests,
   updateServiceRequest,
   deleteServiceRequest,
